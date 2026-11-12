@@ -102,10 +102,9 @@ adb install -r ClassAttendance-v1.0.0.apk
 
 ---
 
-## Preloaded Credentials for Testing
+## First-Time Setup & Account Creation
 
-The SQLite database seeds pre-configured test data upon initial creation:
-
-- **Username**: `test`
-- **Password**: `secret123`
-- *New teacher accounts can also be registered at any time via the "Register" link on the login screen.*
+On first launch, teachers can create an account directly through the app:
+1. Tap the **Register** link on the Teacher Login screen.
+2. Enter your Full Name, Username, and Password.
+3. Log in to start creating classes and taking attendance.
