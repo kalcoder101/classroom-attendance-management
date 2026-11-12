@@ -358,9 +358,9 @@ public class PdfReportExporter {
                 String filename = "Attendance_Report_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".pdf";
                 File pdfFile = new File(reportsDir, filename);
 
-                FileOutputStream fos = new FileOutputStream(pdfFile);
-                document.writeTo(fos);
-                fos.close();
+                try (FileOutputStream fos = new FileOutputStream(pdfFile)) {
+                    document.writeTo(fos);
+                }
                 document.close();
 
                 Uri fileUri = FileProvider.getUriForFile(

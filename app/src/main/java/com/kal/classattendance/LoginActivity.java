@@ -69,6 +69,17 @@ public class LoginActivity extends AppCompatActivity {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
 
+            if (username.isEmpty()) {
+                etUsername.setError("Enter your username");
+                etUsername.requestFocus();
+                return;
+            }
+            if (password.isEmpty()) {
+                etPassword.setError("Enter your password");
+                etPassword.requestFocus();
+                return;
+            }
+
             Teacher teacher = teacherDao.login(username, password);
             if (teacher == null) {
                 Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();

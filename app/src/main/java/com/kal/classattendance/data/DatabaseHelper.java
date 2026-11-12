@@ -115,14 +115,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "(" + COL_STUDENT_ID + ")");
     }
 
+    /**
+     * Schema migrations run here. Tables are never dropped, so updating the app
+     * keeps the teacher's classes, students and attendance history.
+     * To change the schema: bump {@link #DB_VERSION} and add a step for each old
+     * version, e.g. {@code if (oldVersion < 2) db.execSQL("ALTER TABLE ...");}
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Development only: rebuild everything. Children are dropped before parents.
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORDS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SESSIONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDENTS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLASSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEACHERS);
-        onCreate(db);
+        // DB_VERSION is still 1, so there is nothing to migrate yet.
     }
 }

@@ -26,6 +26,16 @@ public class SplashActivity extends AppCompatActivity {
 
     // Kept so we can cancel the infinite float loop when the activity is destroyed
     private ObjectAnimator logoFloatAnim;
+    private final Handler splashHandler = new Handler(Looper.getMainLooper());
+
+    // Delayed jump to Login; cancel it so backing out of the splash is final
+    private final Runnable openLogin = () -> {
+        // Cross-fade: LoginActivity fades in while the splash fades out
+        ActivityOptions options = ActivityOptions.makeCustomAnimation(
+                SplashActivity.this, R.anim.fade_in, R.anim.fade_out);
+        startActivity(new Intent(SplashActivity.this, LoginActivity.class), options.toBundle());
+        finish();
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +50,12 @@ public class SplashActivity extends AppCompatActivity {
 
         startSplashAnimations();
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Cross-fade: LoginActivity fades in while the splash fades out
-            ActivityOptions options = ActivityOptions.makeCustomAnimation(
-                    SplashActivity.this, R.anim.fade_in, R.anim.fade_out);
-            startActivity(new Intent(SplashActivity.this, LoginActivity.class), options.toBundle());
-            finish();
-        }, SPLASH_DELAY_MS);
+        splashHandler.postDelayed(openLogin, SPLASH_DELAY_MS);
     }
 
     @Override
     protected void onDestroy() {
+        splashHandler.removeCallbacks(openLogin);
         if (logoFloatAnim != null) {
             logoFloatAnim.cancel();
         }

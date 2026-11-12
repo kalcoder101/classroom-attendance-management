@@ -72,7 +72,7 @@ The application strictly implements all **four required Android menu and dialog 
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_clear_all"
+        android:id="@+id/menu_mark_all_absent"
         android:title="Mark All Absent"
         app:showAsAction="never" />
 
@@ -115,7 +115,7 @@ toolbar.setOnMenuItemClickListener(item -> {
     } else if (id == R.id.menu_mark_all_present) {
         markAllPresent();
         return true;
-    } else if (id == R.id.menu_clear_all) {
+    } else if (id == R.id.menu_mark_all_absent) {
         markAllStatus(AttendanceDao.STATUS_ABSENT);
         return true;
     } else if (id == R.id.menu_sort_name) {
@@ -261,7 +261,7 @@ private void showStudentPopupMenu(View anchor, Student student,
                     .setMessage("Name: " + student.getFullName() + "\n"
                             + "ID: " + student.getStudentCode() + "\n"
                             + "Class: " + classLabel + "\n"
-                            + "Current Mark: " + statuses.get(student.getId()))
+                            + "Current Mark: " + statusLabel(statuses.get(student.getId())))
                     .setPositiveButton("OK", null)
                     .show();
             return true;

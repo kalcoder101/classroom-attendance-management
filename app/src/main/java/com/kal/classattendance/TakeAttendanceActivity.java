@@ -147,7 +147,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                 markAllPresent();
                 Toast.makeText(this, "Marked all as Present", Toast.LENGTH_SHORT).show();
                 return true;
-            } else if (id == R.id.menu_clear_all) {
+            } else if (id == R.id.menu_mark_all_absent) {
                 markAllStatus(AttendanceDao.STATUS_ABSENT);
                 Toast.makeText(this, "Marked all as Absent", Toast.LENGTH_SHORT).show();
                 return true;
@@ -480,7 +480,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                         .setMessage("Name: " + student.getFullName() + "\n"
                                 + "ID: " + student.getStudentCode() + "\n"
                                 + "Class: " + classLabel + "\n"
-                                + "Current Mark: " + statuses.get(student.getId()))
+                                + "Current Mark: " + statusLabel(statuses.get(student.getId())))
                         .setPositiveButton("OK", null)
                         .show();
                 return true;
@@ -488,6 +488,17 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             return false;
         });
         popup.show();
+    }
+
+    /** "P" / "A" / "L" as the words teachers see in the summary chips. */
+    private static String statusLabel(String status) {
+        if (AttendanceDao.STATUS_ABSENT.equals(status)) {
+            return "Absent";
+        }
+        if (AttendanceDao.STATUS_LATE.equals(status)) {
+            return "Late";
+        }
+        return "Present";
     }
 
     /** Sets every student to a specified status and refreshes the rows + chips. */
