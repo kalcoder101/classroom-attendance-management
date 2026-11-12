@@ -25,16 +25,21 @@
     <!--Dashboards page texts-->
     <string name="dashboard_title">Dashboard</string>
     <string name="logout">Logout</string>
+    <string name="good_morning">Good morning</string>
+    <string name="good_afternoon">Good afternoon</string>
+    <string name="good_evening">Good evening</string>
     <string name="welcome_back">Welcome back</string>
-    <string name="dashboard_subtitle">What would you like to do today?</string>
+    <string name="dashboard_subtitle">Class &amp; attendance overview</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="last_attendance_header">LAST ATTENDANCE RECORDED</string>
     <string name="manage_classes">Manage Classes</string>
     <string name="manage_classes_count">4 classes</string>
     <string name="manage_students">Manage Students</string>
     <string name="manage_students_count">30 students</string>
     <string name="take_attendance">Take Attendance</string>
-    <string name="take_attendance_hint">Mark P / A / L</string>
+    <string name="take_attendance_hint">Start new session</string>
     <string name="reports">Reports</string>
-    <string name="reports_hint">Past sessions</string>
+    <string name="reports_hint">Analytics &amp; PDF</string>
     <string name="last_attendance_label">Last attendance taken</string>
     <string name="last_attendance_class">CS – 4th Year – Section 1</string>
     <string name="last_attendance_summary">5 Nov 2026 · Present 5 · Absent 1 · Late 1</string>

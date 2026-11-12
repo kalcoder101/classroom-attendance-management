@@ -9,7 +9,7 @@
     android:orientation="vertical"
     tools:context=".DashboardActivity">
 
-    <!-- App bar -->
+    <!-- Top App bar -->
     <LinearLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
@@ -26,9 +26,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dashboard_title"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="22sp" />
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/btnLogout"
@@ -42,7 +43,7 @@
             android:src="@drawable/ic_logout" />
     </LinearLayout>
 
-    <!-- Content -->
+    <!-- Main Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -58,63 +59,110 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvWelcome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/welcome_back"
-                android:textColor="@color/text_primary"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvWelcomeSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/dashboard_subtitle"
-                android:textColor="@color/text_secondary"
-                android:textSize="15sp" />
-
-            <!-- Row 1 -->
+            <!-- Hero Welcome Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/card"
+                android:elevation="3dp"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <!-- Date Chip -->
+                <TextView
+                    android:id="@+id/tvTodayDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/chip"
+                    android:backgroundTint="@color/icon_tile"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="11sp" />
+
+                <!-- Time-aware Greeting -->
+                <TextView
+                    android:id="@+id/tvGreetingSalutation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/good_afternoon"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <!-- Teacher Name -->
+                <TextView
+                    android:id="@+id/tvTeacherName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp" />
+
+                <!-- Subtitle overview -->
+                <TextView
+                    android:id="@+id/tvWelcomeSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/dashboard_subtitle"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Section Label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/quick_actions_title"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <!-- Row 1: Classes & Students -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:orientation="horizontal">
 
                 <!-- Manage Classes -->
                 <LinearLayout
                     android:id="@+id/cardManageClasses"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/card_click"
                     android:clickable="true"
-                    android:elevation="4dp"
+                    android:elevation="3dp"
                     android:focusable="true"
+                    android:minHeight="145dp"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:padding="16dp">
 
                     <ImageView
                         android:id="@+id/imgManageClasses"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/icon_tile_box"
                         android:importantForAccessibility="no"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:src="@drawable/ic_manage_classes" />
 
                     <TextView
                         android:id="@+id/tvManageClasses"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/manage_classes"
                         android:textColor="@color/text_primary"
@@ -124,7 +172,7 @@
                         android:id="@+id/tvManageClassesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/manage_classes_count"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
@@ -134,30 +182,31 @@
                 <LinearLayout
                     android:id="@+id/cardManageStudents"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/card_click"
                     android:clickable="true"
-                    android:elevation="4dp"
+                    android:elevation="3dp"
                     android:focusable="true"
+                    android:minHeight="145dp"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:padding="16dp">
 
                     <ImageView
                         android:id="@+id/imgManageStudents"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/icon_tile_box"
                         android:importantForAccessibility="no"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:src="@drawable/ic_manage_students" />
 
                     <TextView
                         android:id="@+id/tvManageStudents"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/manage_students"
                         android:textColor="@color/text_primary"
@@ -167,52 +216,51 @@
                         android:id="@+id/tvManageStudentsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/manage_students_count"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Row 2 -->
+            <!-- Row 2: Take Attendance & Reports -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                >
+                android:orientation="horizontal">
 
                 <!-- Take Attendance -->
                 <LinearLayout
                     android:id="@+id/cardTakeAttendance"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/card_click"
                     android:clickable="true"
-                    android:elevation="4dp"
+                    android:elevation="3dp"
                     android:focusable="true"
+                    android:minHeight="145dp"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:padding="16dp">
 
                     <ImageView
                         android:id="@+id/imgTakeAttendance"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/icon_tile_box"
                         android:importantForAccessibility="no"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:src="@drawable/ic_take_attendance" />
 
                     <TextView
                         android:id="@+id/tvTakeAttendance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/take_attendance"
                         android:textColor="@color/text_primary"
@@ -222,7 +270,7 @@
                         android:id="@+id/tvTakeAttendanceHint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/take_attendance_hint"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
@@ -232,30 +280,31 @@
                 <LinearLayout
                     android:id="@+id/cardReports"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/card_click"
                     android:clickable="true"
-                    android:elevation="4dp"
+                    android:elevation="3dp"
                     android:focusable="true"
+                    android:minHeight="145dp"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:padding="16dp">
 
                     <ImageView
                         android:id="@+id/imgReports"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/icon_tile_box"
                         android:importantForAccessibility="no"
-                        android:padding="10dp"
+                        android:padding="9dp"
                         android:src="@drawable/ic_reports" />
 
                     <TextView
                         android:id="@+id/tvReports"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/reports"
                         android:textColor="@color/text_primary"
@@ -265,22 +314,33 @@
                         android:id="@+id/tvReportsHint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/reports_hint"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Last attendance taken -->
+            <!-- Section Label: Last Attendance -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/last_attendance_header"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <!-- Last attendance taken card -->
             <LinearLayout
                 android:id="@+id/cardLastAttendance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/card_click"
                 android:clickable="true"
-                android:elevation="4dp"
+                android:elevation="3dp"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -292,32 +352,95 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tvLastLabel"
-                        android:layout_width="wrap_content"
+                    <!-- Class & Rate Badge -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/last_attendance_label"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/tvLastClass"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/last_attendance_class"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/tvLastClass"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/last_attendance_class"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvLastSummary"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/tvLastRate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/chip"
+                            android:backgroundTint="@color/icon_tile"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="8dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="8dp"
+                            android:paddingBottom="2dp"
+                            android:textColor="@color/primary_blue"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Date & Status mini badges -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/last_attendance_summary"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvLastDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvLastChipPresent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/chip"
+                            android:backgroundTint="@color/present_bg"
+                            android:paddingStart="6dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="2dp"
+                            android:textColor="@color/present_text"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvLastChipAbsent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/chip"
+                            android:backgroundTint="@color/absent_bg"
+                            android:paddingStart="6dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="2dp"
+                            android:textColor="@color/absent_text"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvLastChipLate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/chip"
+                            android:backgroundTint="@color/late_bg"
+                            android:paddingStart="6dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="2dp"
+                            android:textColor="@color/late_text"
+                            android:textSize="11sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <ImageView
@@ -331,17 +454,5 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- Bottom bar -->
-    <LinearLayout
-        android:id="@+id/bottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bottom_bar"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:elevation="8dp"
-        android:orientation="vertical"
-        android:padding="16dp"/>
 
 </LinearLayout>
