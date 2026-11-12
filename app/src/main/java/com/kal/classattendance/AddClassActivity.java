@@ -54,7 +54,8 @@ public class AddClassActivity extends AppCompatActivity {
         btnSaveClass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String department = etDepartment.getText().toString().trim();
+                // Same normalisation as the class edit dialog so labels match
+                String department = etDepartment.getText().toString().trim().toUpperCase();
                 if (department.isEmpty()) {
                     etDepartment.setError(getString(R.string.hint_department));
                     etDepartment.requestFocus();

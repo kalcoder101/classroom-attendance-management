@@ -336,7 +336,8 @@ public class ManageStudentsActivity extends AppCompatActivity {
 
         dialogView.findViewById(R.id.btnSaveEditStudent).setOnClickListener(v -> {
             String newName = etName.getText().toString().trim();
-            String newCode = etCode.getText().toString().trim();
+            // Same normalisation as Add Student so IDs stay consistent
+            String newCode = etCode.getText().toString().trim().toUpperCase();
 
             if (newName.isEmpty()) {
                 etName.setError("Full name is required");
