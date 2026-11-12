@@ -23,11 +23,25 @@ public class StudentDao {
 
     // true if this class already has a student with this code
     public boolean exists(long classId, String studentCode) {
+        return existsExcept(classId, studentCode, -1);
+    }
+
+    // true if this class already has a student with this code, excluding studentId (for edits)
+    public boolean existsExcept(long classId, String studentCode, long excludeStudentId) {
         SQLiteDatabase db = helper.getReadableDatabase();
+        String selection = COL_CLASS_ID + " = ? AND " + COL_STUDENT_CODE + " = ?";
+        String[] args;
+        if (excludeStudentId != -1) {
+            selection += " AND " + COL_ID + " != ?";
+            args = new String[]{String.valueOf(classId), studentCode, String.valueOf(excludeStudentId)};
+        } else {
+            args = new String[]{String.valueOf(classId), studentCode};
+        }
+
         try (Cursor c = db.query(TABLE_STUDENTS,
                 new String[]{COL_ID},
-                COL_CLASS_ID + " = ? AND " + COL_STUDENT_CODE + " = ?",
-                new String[]{String.valueOf(classId), studentCode},
+                selection,
+                args,
                 null, null, null)) {
             return c.moveToFirst();
         }
@@ -40,6 +54,16 @@ public class StudentDao {
         values.put(COL_STUDENT_CODE, studentCode);
         values.put(COL_FULL_NAME, fullName);
         return helper.getWritableDatabase().insert(TABLE_STUDENTS, null, values);
+    }
+
+    // Updates an existing student's class, code, and full name.
+    public boolean update(long studentId, long classId, String studentCode, String fullName) {
+        ContentValues values = new ContentValues();
+        values.put(COL_CLASS_ID, classId);
+        values.put(COL_STUDENT_CODE, studentCode);
+        values.put(COL_FULL_NAME, fullName);
+        return helper.getWritableDatabase().update(TABLE_STUDENTS, values,
+                COL_ID + " = ?", new String[]{String.valueOf(studentId)}) > 0;
     }
 
     // Removes a student. Attendance records referencing them are deleted too (ON DELETE CASCADE).

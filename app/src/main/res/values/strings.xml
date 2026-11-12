@@ -90,6 +90,8 @@
     <string name="add_student_plus">+ Add Student</string>
     <string name="edit_description">Edit student</string>
     <string name="delete_description">Delete student</string>
+    <string name="edit_class_desc">Edit class</string>
+    <string name="delete_class_desc">Delete class</string>
     <string name="student_name_1">Abebe Kebede</string>
     <string name="student_name_2">Almaz Tadesse</string>
     <string name="student_name_3">Biruk Hailu</string>

@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,6 +46,7 @@ public class ManageStudentsActivity extends AppCompatActivity {
     private LinearLayout listStudents;
     private TextView emptyView;
     private LayoutInflater inflater;
+    private Student selectedStudentForContextMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,26 +179,141 @@ public class ManageStudentsActivity extends AppCompatActivity {
         tvName.setText(student.getFullName());
         tvInfo.setText(student.getInfoLine());
 
-        // Edit is not wired up yet
-        row.findViewById(R.id.btnEdit).setOnClickListener(v ->
-                Toast.makeText(this, "Edit coming soon", Toast.LENGTH_SHORT).show());
+        // Attach student data to row tag for Context Menu lookup
+        row.setTag(student);
+        registerForContextMenu(row);
+
+        // Edit dialog
+        row.findViewById(R.id.btnEdit).setOnClickListener(v -> showEditDialog(student));
 
         // Delete asks first, then removes from the database
-        row.findViewById(R.id.btnDelete).setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Delete student")
-                    .setMessage("Remove " + student.getFullName() + " ("
-                            + student.getStudentCode() + ")?")
-                    .setPositiveButton("Delete", (d, w) -> {
-                        studentDao.delete(student.getId());
-                        allStudents = studentDao.listForTeacher(teacherId);
-                        renderStudents();
-                        Toast.makeText(this, "Student deleted", Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        });
+        row.findViewById(R.id.btnDelete).setOnClickListener(v -> confirmDeleteStudent(student));
 
         return row;
+    }
+
+    private void confirmDeleteStudent(Student student) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete student")
+                .setMessage("Remove " + student.getFullName() + " ("
+                        + student.getStudentCode() + ")?")
+                .setPositiveButton("Delete", (d, w) -> {
+                    studentDao.delete(student.getId());
+                    allStudents = studentDao.listForTeacher(teacherId);
+                    renderStudents();
+                    Toast.makeText(this, "Student deleted", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getTag() instanceof Student) {
+            selectedStudentForContextMenu = (Student) v.getTag();
+            menu.setHeaderTitle(selectedStudentForContextMenu.getFullName() + " (" + selectedStudentForContextMenu.getStudentCode() + ")");
+            getMenuInflater().inflate(R.menu.menu_student_context, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (selectedStudentForContextMenu == null) {
+            return super.onContextItemSelected(item);
+        }
+
+        int id = item.getItemId();
+        if (id == R.id.ctx_edit_student) {
+            showEditDialog(selectedStudentForContextMenu);
+            return true;
+        } else if (id == R.id.ctx_view_attendance) {
+            Intent intent = new Intent(this, TakeAttendanceActivity.class);
+            intent.putExtra(LoginActivity.EXTRA_TEACHER_ID, teacherId);
+            intent.putExtra(ClassListActivity.EXTRA_CLASS_ID, selectedStudentForContextMenu.getClassId());
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.ctx_delete_student) {
+            confirmDeleteStudent(selectedStudentForContextMenu);
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    private void showEditDialog(Student student) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_student, null);
+        EditText etName = dialogView.findViewById(R.id.etEditStudentName);
+        EditText etCode = dialogView.findViewById(R.id.etEditStudentCode);
+        Spinner spClass = dialogView.findViewById(R.id.spEditStudentClass);
+
+        etName.setText(student.getFullName());
+        etCode.setText(student.getStudentCode());
+
+        // Fill class spinner with teacher's classes
+        List<String> classNames = new ArrayList<>();
+        int selectedIndex = 0;
+        for (int i = 0; i < classes.size(); i++) {
+            SchoolClass c = classes.get(i);
+            classNames.add(c.getLabel());
+            if (c.getId() == student.getClassId()) {
+                selectedIndex = i;
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                classNames
+        );
+        spClass.setAdapter(adapter);
+        spClass.setSelection(selectedIndex);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialogView.findViewById(R.id.btnCancelEditStudent).setOnClickListener(v -> dialog.dismiss());
+
+        dialogView.findViewById(R.id.btnSaveEditStudent).setOnClickListener(v -> {
+            String newName = etName.getText().toString().trim();
+            String newCode = etCode.getText().toString().trim();
+
+            if (newName.isEmpty()) {
+                etName.setError("Full name is required");
+                return;
+            }
+            if (newCode.isEmpty()) {
+                etCode.setError("Student ID is required");
+                return;
+            }
+
+            int pos = spClass.getSelectedItemPosition();
+            if (pos < 0 || pos >= classes.size()) {
+                Toast.makeText(this, "Please select a valid class", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            long newClassId = classes.get(pos).getId();
+
+            if (studentDao.existsExcept(newClassId, newCode, student.getId())) {
+                etCode.setError("Another student in this class already has this ID");
+                return;
+            }
+
+            boolean updated = studentDao.update(student.getId(), newClassId, newCode, newName);
+            if (updated) {
+                Toast.makeText(this, "Student updated successfully", Toast.LENGTH_SHORT).show();
+                allStudents = studentDao.listForTeacher(teacherId);
+                renderStudents();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(this, "Failed to update student", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
     }
 }

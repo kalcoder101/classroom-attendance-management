@@ -22,13 +22,28 @@ public class ClassDao {
 
     // true if this teacher already has a class with the same department/year/section
     public boolean exists(long teacherId, String department, int year, int section) {
+        return existsExcept(teacherId, department, year, section, -1);
+    }
+
+    // true if another class of this teacher already has department/year/section
+    public boolean existsExcept(long teacherId, String department, int year, int section, long excludeClassId) {
         SQLiteDatabase db = helper.getReadableDatabase();
+        String selection = COL_TEACHER_ID + " = ? AND " + COL_DEPARTMENT + " = ? AND "
+                + COL_YEAR + " = ? AND " + COL_SECTION + " = ?";
+        String[] args;
+        if (excludeClassId != -1) {
+            selection += " AND " + COL_ID + " != ?";
+            args = new String[]{String.valueOf(teacherId), department,
+                    String.valueOf(year), String.valueOf(section), String.valueOf(excludeClassId)};
+        } else {
+            args = new String[]{String.valueOf(teacherId), department,
+                    String.valueOf(year), String.valueOf(section)};
+        }
+
         try (Cursor c = db.query(TABLE_CLASSES,
                 new String[]{COL_ID},
-                COL_TEACHER_ID + " = ? AND " + COL_DEPARTMENT + " = ? AND "
-                        + COL_YEAR + " = ? AND " + COL_SECTION + " = ?",
-                new String[]{String.valueOf(teacherId), department,
-                        String.valueOf(year), String.valueOf(section)},
+                selection,
+                args,
                 null, null, null)) {
             return c.moveToFirst();
         }
@@ -42,6 +57,23 @@ public class ClassDao {
         values.put(COL_YEAR, year);
         values.put(COL_SECTION, section);
         return helper.getWritableDatabase().insert(TABLE_CLASSES, null, values);
+    }
+
+    // Updates an existing class. Returns true if updated.
+    public boolean update(long classId, String department, int year, int section) {
+        ContentValues values = new ContentValues();
+        values.put(COL_DEPARTMENT, department);
+        values.put(COL_YEAR, year);
+        values.put(COL_SECTION, section);
+        return helper.getWritableDatabase().update(TABLE_CLASSES, values,
+                COL_ID + " = ?", new String[]{String.valueOf(classId)}) > 0;
+    }
+
+    // Deletes a class. Cascades to students, sessions, and records.
+    public boolean delete(long classId) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        return db.delete(TABLE_CLASSES, COL_ID + " = ?",
+                new String[]{String.valueOf(classId)}) > 0;
     }
 
     // All classes of this teacher, each with its student count, in stable order
