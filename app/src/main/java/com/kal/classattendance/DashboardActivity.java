@@ -92,10 +92,19 @@ public class DashboardActivity extends AppCompatActivity {
         TextView tvSummary = findViewById(R.id.tvLastSummary);
 
         if (last != null) {
+            String formattedDate = last.getSessionDate();
+            try {
+                java.text.SimpleDateFormat dbFmt = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+                java.text.SimpleDateFormat displayFmt = new java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale.US);
+                java.util.Date d = dbFmt.parse(last.getSessionDate());
+                if (d != null) formattedDate = displayFmt.format(d);
+            } catch (Exception ignored) {}
+
             tvClass.setText(last.getClassLabel());
-            tvSummary.setText(last.getSessionDate() + " · Present " + last.getPresentCount()
+            tvSummary.setText(formattedDate + " · Present " + last.getPresentCount()
                     + " · Absent " + last.getAbsentCount() + " · Late " + last.getLateCount());
 
+            // Tapping opens the attendance session to view/edit
             findViewById(R.id.cardLastAttendance).setOnClickListener(v -> {
                 Intent intent = new Intent(DashboardActivity.this, TakeAttendanceActivity.class);
                 intent.putExtra(ClassListActivity.EXTRA_CLASS_ID, last.getClassId());
@@ -105,9 +114,16 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         } else {
-            tvClass.setText(R.string.take_attendance_hint);
-            tvSummary.setText("No sessions taken yet. Tap 'Take Attendance' to start.");
-            findViewById(R.id.cardLastAttendance).setOnClickListener(null);
+            tvClass.setText(R.string.take_attendance);
+            tvSummary.setText("No sessions taken yet. Tap to start taking attendance.");
+
+            // Tapping opens class list to take attendance
+            findViewById(R.id.cardLastAttendance).setOnClickListener(v -> {
+                Intent intent = new Intent(DashboardActivity.this, ClassListActivity.class);
+                intent.putExtra(LoginActivity.EXTRA_TEACHER_ID, teacherId);
+                intent.putExtra(ClassListActivity.EXTRA_MODE, ClassListActivity.MODE_ATTENDANCE);
+                startActivity(intent);
+            });
         }
     }
 }
