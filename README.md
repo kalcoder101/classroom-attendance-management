@@ -2,7 +2,10 @@
 
 An Android mobile application for instructors and teachers to manage classes, maintain student rosters, record daily attendance sessions, and generate multi-page institutional PDF attendance reports.
 
-Built as a **Mobile Programming Project** using Native Android (Java), SQLite database persistence with cascading constraints, and modern Material 3 design.
+> **Course**: Mobile App Development  
+> **Technologies Used**: **Java**, **XML**, and **SQLite**
+
+Built as a semester project for the **Mobile App Development** course using Native Android (**Java**), declarative **XML** UI layouts, and local **SQLite** database persistence with foreign key cascade constraints.
 
 ---
 
