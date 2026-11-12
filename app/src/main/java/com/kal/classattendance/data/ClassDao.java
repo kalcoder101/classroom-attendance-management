@@ -79,7 +79,7 @@ public class ClassDao {
     // All classes of this teacher, each with its student count, in stable order
     public List<SchoolClass> listForTeacher(long teacherId) {
         SQLiteDatabase db = helper.getReadableDatabase();
-        String sql = "SELECT c." + COL_ID + ", c." + COL_TEACHER_ID + ", c." + COL_DEPARTMENT
+        String sql = "SELECT c." + COL_ID + ", c." + COL_DEPARTMENT
                 + ", c." + COL_YEAR + ", c." + COL_SECTION
                 + ", COUNT(s." + COL_ID + ") AS student_count"
                 + " FROM " + TABLE_CLASSES + " c"
@@ -93,7 +93,6 @@ public class ClassDao {
             while (c.moveToNext()) {
                 result.add(new SchoolClass(
                         c.getLong(c.getColumnIndexOrThrow(COL_ID)),
-                        c.getLong(c.getColumnIndexOrThrow(COL_TEACHER_ID)),
                         c.getString(c.getColumnIndexOrThrow(COL_DEPARTMENT)),
                         c.getInt(c.getColumnIndexOrThrow(COL_YEAR)),
                         c.getInt(c.getColumnIndexOrThrow(COL_SECTION)),

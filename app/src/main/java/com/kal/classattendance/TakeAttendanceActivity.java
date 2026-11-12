@@ -37,10 +37,8 @@ import com.kal.classattendance.util.Logout;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import android.view.MenuItem;
 import android.widget.PopupMenu;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -334,9 +332,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
         String dateKey = DB_DATE.format(sessionDate.getTime());
         savedStatuses.clear();
-        if (attendanceDao.hasSession(classId, dateKey)) {
-            savedStatuses.putAll(
-                    attendanceDao.loadRecords(attendanceDao.getOrCreateSession(classId, dateKey)));
+        long sessionId = attendanceDao.findSessionId(classId, dateKey);
+        if (sessionId != -1) {
+            savedStatuses.putAll(attendanceDao.loadRecords(sessionId));
         }
 
         statuses.clear();

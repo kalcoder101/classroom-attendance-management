@@ -165,9 +165,9 @@
     <string name="attendance_saved_title">Attendance saved</string>
     <string name="attendance_saved_summary">%1$s: %2$d P, %3$d A, %4$d L</string>
     <!--Attendance report texts-->
-    <string name="reports_title">Attendance Reports</string>
+    <string name="reports_title">Reports</string>
     <string name="reports_caption">Past sessions · tap one to edit marks</string>
-    <string name="export_pdf">Export PDF</string>
+    <string name="export_pdf">Export</string>
     <string name="generating_pdf">Generating PDF report…</string>
     <string name="pdf_exported">Report PDF saved</string>
     <string name="pdf_export_failed">Could not export PDF</string>

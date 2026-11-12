@@ -26,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
 
     // Kept so we can cancel the infinite float loop when the activity is destroyed
     private ObjectAnimator logoFloatAnim;
+    private ObjectAnimator progressFillAnim;
     private final Handler splashHandler = new Handler(Looper.getMainLooper());
 
     // Delayed jump to Login; cancel it so backing out of the splash is final
@@ -58,6 +59,9 @@ public class SplashActivity extends AppCompatActivity {
         splashHandler.removeCallbacks(openLogin);
         if (logoFloatAnim != null) {
             logoFloatAnim.cancel();
+        }
+        if (progressFillAnim != null) {
+            progressFillAnim.cancel();
         }
         super.onDestroy();
     }
@@ -109,9 +113,9 @@ public class SplashActivity extends AppCompatActivity {
                 .setStartDelay(300L).setDuration(400L)
                 .start();
 
-        ObjectAnimator fillAnim = ObjectAnimator.ofInt(progress, "progress", 0, 100);
-        fillAnim.setDuration(SPLASH_DELAY_MS - 300L);
-        fillAnim.setInterpolator(new DecelerateInterpolator());
-        fillAnim.start();
+        progressFillAnim = ObjectAnimator.ofInt(progress, "progress", 0, 100);
+        progressFillAnim.setDuration(SPLASH_DELAY_MS - 300L);
+        progressFillAnim.setInterpolator(new DecelerateInterpolator());
+        progressFillAnim.start();
     }
 }

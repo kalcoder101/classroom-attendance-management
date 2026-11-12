@@ -149,9 +149,12 @@ public class AttendanceDao {
         return result;
     }
 
-    /** true when this class already has attendance saved for the given date. */
-    public boolean hasSession(long classId, String sessionDate) {
-        return findSessionId(helper.getReadableDatabase(), classId, sessionDate) != -1;
+    /**
+     * _id of the session saved for this class + date, or -1 when nothing has
+     * been saved yet. Read-only: merely viewing a date must not create a row.
+     */
+    public long findSessionId(long classId, String sessionDate) {
+        return findSessionId(helper.getReadableDatabase(), classId, sessionDate);
     }
 
     // ==================== Attendance Rule ====================
@@ -178,7 +181,6 @@ public class AttendanceDao {
     // ==================== Reports & Analytics Support ====================
 
     public static class SessionSummary {
-        private final long sessionId;
         private final long classId;
         private final String classLabel;
         private final String sessionDate;
@@ -187,10 +189,9 @@ public class AttendanceDao {
         private final int lateCount;
         private final int totalStudents;
 
-        public SessionSummary(long sessionId, long classId, String classLabel,
+        public SessionSummary(long classId, String classLabel,
                               String sessionDate, int presentCount, int absentCount,
                               int lateCount, int totalStudents) {
-            this.sessionId = sessionId;
             this.classId = classId;
             this.classLabel = classLabel;
             this.sessionDate = sessionDate;
@@ -200,14 +201,12 @@ public class AttendanceDao {
             this.totalStudents = totalStudents;
         }
 
-        public long getSessionId() { return sessionId; }
         public long getClassId() { return classId; }
         public String getClassLabel() { return classLabel; }
         public String getSessionDate() { return sessionDate; }
         public int getPresentCount() { return presentCount; }
         public int getAbsentCount() { return absentCount; }
         public int getLateCount() { return lateCount; }
-        public int getTotalStudents() { return totalStudents; }
 
         public float getAttendanceRate() {
             return AttendanceDao.attendanceRate(presentCount, lateCount, totalStudents);
@@ -226,27 +225,9 @@ public class AttendanceDao {
             this.totalSessions = totalSessions;
             this.totalPresent = totalPresent;
             this.totalAbsent = totalAbsent;
-            this.totalLate = lateCountClean(totalLate);
+            this.totalLate = Math.max(0, totalLate);
             this.totalRecords = totalPresent + totalAbsent + this.totalLate;
             this.attendanceRate = AttendanceDao.attendanceRate(totalPresent, this.totalLate, totalRecords);
-        }
-
-        private static int lateCountClean(int late) {
-            return Math.max(0, late);
-        }
-    }
-
-    public static class StudentAttendanceRecord {
-        public final long studentId;
-        public final String studentCode;
-        public final String fullName;
-        public final String status;
-
-        public StudentAttendanceRecord(long studentId, String studentCode, String fullName, String status) {
-            this.studentId = studentId;
-            this.studentCode = studentCode;
-            this.fullName = fullName;
-            this.status = status;
         }
     }
 
@@ -282,10 +263,15 @@ public class AttendanceDao {
 
     /** List of session summaries for a teacher, optionally filtered by classId (-1 for all). */
     public java.util.List<SessionSummary> getSessionSummaries(long teacherId, long classIdFilter) {
+        return querySessionSummaries(teacherId, classIdFilter, -1);
+    }
+
+    /** Shared session query; a positive {@code limit} keeps only the newest rows. */
+    private java.util.List<SessionSummary> querySessionSummaries(
+            long teacherId, long classIdFilter, int limit) {
         SQLiteDatabase db = helper.getReadableDatabase();
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT s.").append(COL_ID).append(" AS session_id, ")
-           .append("s.").append(COL_CLASS_ID).append(", ")
+        sql.append("SELECT s.").append(COL_CLASS_ID).append(", ")
            .append("c.").append(COL_DEPARTMENT).append(", ")
            .append("c.").append(COL_YEAR).append(", ")
            .append("c.").append(COL_SECTION).append(", ")
@@ -309,11 +295,13 @@ public class AttendanceDao {
 
         sql.append("GROUP BY s.").append(COL_ID).append(" ")
            .append("ORDER BY s.").append(COL_SESSION_DATE).append(" DESC, s.").append(COL_ID).append(" DESC");
+        if (limit > 0) {
+            sql.append(" LIMIT ").append(limit);
+        }
 
         java.util.List<SessionSummary> list = new java.util.ArrayList<>();
         try (Cursor c = db.rawQuery(sql.toString(), args.toArray(new String[0]))) {
             while (c.moveToNext()) {
-                long sessionId = c.getLong(c.getColumnIndexOrThrow("session_id"));
                 long classId = c.getLong(c.getColumnIndexOrThrow(COL_CLASS_ID));
                 String dept = c.getString(c.getColumnIndexOrThrow(COL_DEPARTMENT));
                 int year = c.getInt(c.getColumnIndexOrThrow(COL_YEAR));
@@ -327,7 +315,7 @@ public class AttendanceDao {
                 String label = dept + " – " + com.kal.classattendance.model.SchoolClass.yearLabel(year)
                         + " Year – Section " + section;
 
-                list.add(new SessionSummary(sessionId, classId, label, date, p, a, l, total));
+                list.add(new SessionSummary(classId, label, date, p, a, l, total));
             }
         }
         return list;
@@ -369,32 +357,8 @@ public class AttendanceDao {
 
     /** Returns the most recent attendance session recorded by this teacher. */
     public SessionSummary getLatestSessionForTeacher(long teacherId) {
-        java.util.List<SessionSummary> list = getSessionSummaries(teacherId, -1);
+        java.util.List<SessionSummary> list = querySessionSummaries(teacherId, -1, 1);
         return list.isEmpty() ? null : list.get(0);
-    }
-
-    /** List student attendance details for a given session. */
-    public java.util.List<StudentAttendanceRecord> getSessionDetails(long sessionId) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        String sql = "SELECT st." + COL_ID + ", st." + COL_STUDENT_CODE + ", st." + COL_FULL_NAME
-                + ", r." + COL_STATUS
-                + " FROM " + TABLE_RECORDS + " r"
-                + " JOIN " + TABLE_STUDENTS + " st ON st." + COL_ID + " = r." + COL_STUDENT_ID
-                + " WHERE r." + COL_SESSION_ID + " = ?"
-                + " ORDER BY st." + COL_FULL_NAME + " ASC";
-
-        java.util.List<StudentAttendanceRecord> records = new java.util.ArrayList<>();
-        try (Cursor c = db.rawQuery(sql, new String[]{String.valueOf(sessionId)})) {
-            while (c.moveToNext()) {
-                records.add(new StudentAttendanceRecord(
-                        c.getLong(0),
-                        c.getString(1),
-                        c.getString(2),
-                        c.getString(3)
-                ));
-            }
-        }
-        return records;
     }
 
     /**

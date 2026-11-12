@@ -29,7 +29,7 @@ public class AttendanceRateTest {
     @Test
     public void sessionRate_countsLateAsAttended() {
         SessionSummary summary =
-                new SessionSummary(1L, 2L, "CS – 2nd Year – Section A", "2026-11-10", 5, 0, 5, 10);
+                new SessionSummary(2L, "CS – 2nd Year – Section A", "2026-11-10", 5, 0, 5, 10);
         assertEquals(100f, summary.getAttendanceRate(), DELTA);
     }
 

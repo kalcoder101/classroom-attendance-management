@@ -3,16 +3,14 @@ package com.kal.classattendance.model;
 public class SchoolClass {
 
     private final long id;
-    private final long teacherId;
     private final String department;
     private final int year;
     private final int section;
     private final int studentCount;
 
-    public SchoolClass(long id, long teacherId, String department,
+    public SchoolClass(long id, String department,
                        int year, int section, int studentCount) {
         this.id = id;
-        this.teacherId = teacherId;
         this.department = department;
         this.year = year;
         this.section = section;
@@ -20,8 +18,6 @@ public class SchoolClass {
     }
 
     public long getId() { return id; }
-
-    public long getTeacherId() { return teacherId; }
 
     public String getDepartment() { return department; }
 

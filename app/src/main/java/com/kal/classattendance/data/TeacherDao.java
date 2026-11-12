@@ -48,7 +48,7 @@ public class TeacherDao {
     public Teacher login(String username, String password) {
         SQLiteDatabase db = helper.getReadableDatabase();
         try (Cursor c = db.query(TABLE_TEACHERS,
-                new String[]{COL_ID, COL_FULL_NAME, COL_USERNAME, COL_PASSWORD_HASH, COL_SALT},
+                new String[]{COL_ID, COL_FULL_NAME, COL_PASSWORD_HASH, COL_SALT},
                 COL_USERNAME + " = ?",
                 new String[]{username},
                 null, null, null)) {
@@ -64,8 +64,7 @@ public class TeacherDao {
             }
             return new Teacher(
                     c.getLong(c.getColumnIndexOrThrow(COL_ID)),
-                    c.getString(c.getColumnIndexOrThrow(COL_FULL_NAME)),
-                    c.getString(c.getColumnIndexOrThrow(COL_USERNAME)));
+                    c.getString(c.getColumnIndexOrThrow(COL_FULL_NAME)));
         }
     }
 
@@ -73,7 +72,7 @@ public class TeacherDao {
     public Teacher getById(long id) {
         SQLiteDatabase db = helper.getReadableDatabase();
         try (Cursor c = db.query(TABLE_TEACHERS,
-                new String[]{COL_ID, COL_FULL_NAME, COL_USERNAME},
+                new String[]{COL_ID, COL_FULL_NAME},
                 COL_ID + " = ?",
                 new String[]{String.valueOf(id)},
                 null, null, null)) {
@@ -83,8 +82,7 @@ public class TeacherDao {
             }
             return new Teacher(
                     c.getLong(c.getColumnIndexOrThrow(COL_ID)),
-                    c.getString(c.getColumnIndexOrThrow(COL_FULL_NAME)),
-                    c.getString(c.getColumnIndexOrThrow(COL_USERNAME)));
+                    c.getString(c.getColumnIndexOrThrow(COL_FULL_NAME)));
         }
     }
 }

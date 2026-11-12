@@ -84,10 +84,6 @@ public class ReportsActivity extends AppCompatActivity {
 
         // Bind UI Views
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-        View btnLogout = findViewById(R.id.btnLogout);
-        if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> com.kal.classattendance.util.Logout.go(this));
-        }
 
         spClass = findViewById(R.id.spClass);
         tvOverallRate = findViewById(R.id.tvOverallRate);
