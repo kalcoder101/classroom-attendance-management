@@ -1,0 +1,91 @@
+# Classroom Attendance Management
+
+An Android mobile application for instructors and teachers to manage classes, maintain student rosters, record daily attendance sessions, and generate multi-page institutional PDF attendance reports.
+
+Built as a **Mobile Programming Project** using Native Android (Java), SQLite database persistence with cascading constraints, and modern Material 3 design.
+
+---
+
+## Key Features
+
+- **Teacher Authentication**: Register new teacher accounts and log in securely. Passwords support show/hide visibility toggles with soft-keyboard insets handling.
+- **Dynamic Dashboard**:
+  - Time-of-day contextual greeting (`Good morning,`, `Good afternoon,`, `Good evening,`).
+  - Uppercase date chip with live counters for classes, enrolled students, and sessions.
+  - Interactive "Last Attendance Recorded" card displaying date, attendance rate percentage badge, and Present/Absent/Late status pills with tap-to-review navigation.
+- **Class Management**:
+  - Create, view, edit, and delete academic classes (Department, Year, Section).
+  - Deletion includes an explicit cascade warning confirming removal of enrolled students and historical attendance sessions.
+- **Student Management**:
+  - Real-time search across student names and student IDs.
+  - Class filter dropdown.
+  - Add, edit, and delete enrolled students.
+- **Take Attendance**:
+  - Material 3 Date Picker with past-dates validation and relative date labels.
+  - Radio options per student: **Present (P)**, **Absent (A)**, **Late (L)**.
+  - Live summary chips updated on the fly.
+  - Bulk actions: "Mark All Present" button and "Mark All Absent" menu option.
+- **Analytics & Multi-Page PDF Reports**:
+  - Filter reports by specific class or view overall statistics across all classes.
+  - Summary cards: Overall Attendance Rate, Total Sessions, and aggregated Present/Absent/Late counts.
+  - Custom Canvas-based Attendance Rate Trend line & area chart.
+  - **Native Multi-Page PDF Export**: Generates printable A4 reports containing institution headers, attendance KPI grid, recent sessions table, complete student roster with `<75%` low attendance warnings (`⚠`), and instructor signature block. Shared directly via Android `FileProvider`.
+
+---
+
+## Android Menu & Dialog Architecture
+
+This project strictly adheres to course requirements by implementing all four standard Android menu and dialog mechanisms:
+
+| Type | Implementation | Location | Actions |
+|---|---|---|---|
+| **Dialog** | `AlertDialog` & Custom Views | `ManageStudentsActivity`, `ClassListActivity`, `TakeAttendanceActivity` | Custom edit dialogs (`dialog_edit_student.xml`, `dialog_edit_class.xml`), deletion confirmation dialogs, and student info dialogs. |
+| **Options Menu** | `menu_take_attendance.xml` | `TakeAttendanceActivity` (App Bar 3-dot overflow) | Bulk "Mark All Present", "Mark All Absent", radio group "Sort by Name / ID", and checkbox "Show/Hide Student ID". |
+| **Context Menu** | `menu_student_context.xml` | `ManageStudentsActivity` (Long-press student row) | Floating contextual menu titled with the student's name and ID: "Edit Student", "Take / View Attendance", and "Delete Student". |
+| **Popup Menu** | `android.widget.PopupMenu` | `TakeAttendanceActivity` (Row 3-dot button) | Anchored dropdown on each student row: "Mark Present", "Mark Absent", "Mark Late", and "Student Info". |
+
+---
+
+## Tech Stack & Architecture
+
+- **Language**: Java 11
+- **Target SDK**: Android 16 (API 37) | **Minimum SDK**: Android 7.0 (API 24)
+- **Architecture**: MVC with Repository/DAO Pattern (`TeacherDao`, `ClassDao`, `StudentDao`, `AttendanceDao`)
+- **Database**: SQLite (`class_attendance.db`) with Foreign Keys enabled and `ON DELETE CASCADE`
+- **UI Components**: Material Components (`com.google.android.material`), AndroidX AppCompat
+- **PDF Engine**: Native Android `android.graphics.pdf.PdfDocument` with `FileProvider`
+
+---
+
+## Installation & Setup
+
+### Option 1: Direct APK Installation
+Download the pre-compiled APK from the [Releases](https://github.com/kalcoder101/classroom-attendance-management/releases) section or install directly via ADB:
+```bash
+adb install -r ClassAttendance-v1.0.0.apk
+```
+
+### Option 2: Build from Source
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/kalcoder101/classroom-attendance-management.git
+   cd classroom-attendance-management
+   ```
+2. Build the project using Gradle:
+   ```bash
+   ./gradlew assembleDebug
+   ```
+3. Run the unit test suite:
+   ```bash
+   ./gradlew test
+   ```
+
+---
+
+## Preloaded Credentials for Testing
+
+The SQLite database seeds pre-configured test data upon initial creation:
+
+- **Username**: `test`
+- **Password**: `secret123`
+- *New teacher accounts can also be registered at any time via the "Register" link on the login screen.*
