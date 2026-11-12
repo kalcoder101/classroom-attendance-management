@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/screen_bg_white"
+    android:orientation="vertical"
+    tools:context=".ClassListActivity">
+
+  <!-- App bar -->
+  <LinearLayout
+      android:id="@+id/appBar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:background="@color/primary_blue"
+      android:elevation="4dp"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingStart="4dp"
+      android:paddingEnd="8dp">
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/back_description"
+        android:focusable="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_arrow_back" />
+
+    <TextView
+        android:id="@+id/tvAppBarTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:text="@string/my_classes_title"
+        android:textColor="@color/white"
+        android:textSize="22sp" />
+
+    <ImageView
+        android:id="@+id/btnLogout"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/logout"
+        android:focusable="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_logout" />
+  </LinearLayout>
+
+  <!-- Content -->
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:background="@color/background_light"
+      android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+      <TextView
+          android:id="@+id/tvHint"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/my_classes_hint"
+          android:textColor="@color/text_secondary"
+          android:textSize="15sp" />
+
+      <!-- Class list is built in code from the database -->
+      <LinearLayout
+          android:id="@+id/listClasses"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:clipChildren="false"
+          android:clipToPadding="false"
+          android:orientation="vertical" />
+
+      <!-- Shown when the teacher has no classes yet -->
+      <TextView
+          android:id="@+id/tvEmptyClasses"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="40dp"
+          android:gravity="center"
+          android:text="@string/no_classes_yet"
+          android:textColor="@color/text_secondary"
+          android:textSize="15sp"
+          android:visibility="gone" />
+
+    </LinearLayout>
+  </ScrollView>
+
+  <!-- Bottom bar -->
+  <LinearLayout
+      android:id="@+id/bottomBar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@drawable/bottom_bar"
+      android:clipChildren="false"
+      android:clipToPadding="false"
+      android:elevation="8dp"
+      android:orientation="vertical"
+      android:padding="16dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddClass"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:elevation="6dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:stateListAnimator="@null"
+        android:text="@string/add_class"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="@color/primary_blue"
+        app:cornerRadius="12dp" />
+  </LinearLayout>
+
+</LinearLayout>

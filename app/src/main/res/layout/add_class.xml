@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/screen_bg_gray"
+    android:orientation="vertical"
+    tools:context=".AddClassActivity">
+
+  <!-- App bar with back arrow -->
+  <LinearLayout
+      android:id="@+id/appBar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:background="@color/primary_blue"
+      android:elevation="4dp"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingStart="4dp"
+      android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/back_description"
+        android:focusable="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_arrow_back" />
+
+    <TextView
+        android:id="@+id/tvAppBarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/add_class_title"
+        android:textColor="@color/white"
+        android:textSize="22sp" />
+  </LinearLayout>
+
+  <!-- Content -->
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:background="@color/background_light"
+      android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+      <!-- Form card -->
+      <LinearLayout
+          android:id="@+id/cardAddClass"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/card"
+          android:clipChildren="false"
+          android:clipToPadding="false"
+          android:elevation="8dp"
+          android:orientation="vertical"
+          android:padding="20dp">
+
+        <!-- Department -->
+        <TextView
+            android:id="@+id/tvDepartmentLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_department"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/input_box"
+            android:hint="@string/hint_department"
+            android:imeOptions="actionDone"
+            android:inputType="textCapWords"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:textSize="16sp" />
+
+        <!-- Year -->
+        <TextView
+            android:id="@+id/tvYearLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/label_year"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spYear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/dropdown_box"
+            android:entries="@array/year_options"
+            android:paddingStart="8dp"
+            android:paddingEnd="40dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Light" />
+
+        <!-- Section -->
+        <TextView
+            android:id="@+id/tvSectionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/label_section"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spSection"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/dropdown_box"
+            android:entries="@array/section_options"
+            android:paddingStart="8dp"
+            android:paddingEnd="40dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Light" />
+
+        <!-- Buttons -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveClass"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:elevation="6dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:stateListAnimator="@null"
+            android:text="@string/btn_save_class"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary_blue"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/btn_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/primary_blue"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/primary_blue"
+            app:strokeWidth="1.5dp" />
+
+      </LinearLayout>
+    </LinearLayout>
+  </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,173 @@
+<resources>
+    <string name="app_name">Class Attendance</string>
+    <string name="splash_tagline">Attendance made simple</string>
+    <string name="logo_description">Class Attendance logo</string>
+    <!--Login activity Strings -->
+    <string name="login_title">Teacher Login</string>
+    <string name="login_subtitle">Sign in to manage your classes</string>
+    <string name="label_username_email">Username or email</string>
+    <string name="label_password">Password</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="new_teacher">New teacher?</string>
+    <string name="register_link"><u>Register</u></string>
+    <!--Registration page texts-->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Register as a teacher to get started</string>
+    <string name="label_full_name">Full name</string>
+    <string name="label_confirm_password">Confirm password</string>
+    <string name="hint_full_name">Your full name</string>
+    <string name="hint_confirm_password">Re-enter password</string>
+    <string name="btn_register">Register</string>
+    <string name="already_registered">Already registered?</string>
+    <string name="login_link"><u>Login</u></string>
+    <!--Dashboards page texts-->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="logout">Logout</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="dashboard_subtitle">What would you like to do today?</string>
+    <string name="manage_classes">Manage Classes</string>
+    <string name="manage_classes_count">4 classes</string>
+    <string name="manage_students">Manage Students</string>
+    <string name="manage_students_count">30 students</string>
+    <string name="take_attendance">Take Attendance</string>
+    <string name="take_attendance_hint">Mark P / A / L</string>
+    <string name="reports">Reports</string>
+    <string name="reports_hint">Past sessions</string>
+    <string name="last_attendance_label">Last attendance taken</string>
+    <string name="last_attendance_class">CS – 4th Year – Section 1</string>
+    <string name="last_attendance_summary">5 Nov 2026 · Present 5 · Absent 1 · Late 1</string>
+    <string name="add_class">+ Add Class</string>
+    <!--Manage Classlist texts-->
+    <string name="my_classes_title">My Classes</string>
+    <string name="my_classes_hint">Welcome back. Pick a class to take attendance.</string>
+    <string name="no_classes_yet">No classes yet. Tap "Add Class" to create your first one.</string>
+    <string name="class_cs4_s1">CS – 4th Year – Section 1</string>
+    <string name="class_cs4_s2">CS – 4th Year – Section 2</string>
+    <string name="class_it2_s1">MRKT– 2nd Year – Section 1</string>
+    <string name="class_math1_s3">BUAD– 1st Year – Section 2</string>
+    <string name="students_7">25 students</string>
+    <string name="students_6">23 students</string>
+    <string name="students_9">30 students</string>
+    <string name="students_8">28 students</string>
+    <!--AddClass Texts-->
+    <string name="add_class_title">Add Class</string>
+    <string name="back_description">Back</string>
+    <string name="label_department">Department</string>
+    <string name="label_year">Year</string>
+    <string name="label_section">Section</string>
+    <string name="hint_department">e.g. CS, MRKT, BUAD</string>
+    <string name="btn_save_class">Save Class</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <string-array name="year_options">
+        <item>1st Year</item>
+        <item>2nd Year</item>
+        <item>3rd Year</item>
+        <item>4th Year</item>
+    </string-array>
+
+    <string-array name="section_options">
+        <item>Section 1</item>
+        <item>Section 2</item>
+        <item>Section 3</item>
+        <item>Section 4</item>
+        <item>Section 5</item>
+    </string-array>
+
+    <!--Manage students texts-->
+    <string name="hint_search_student">Search by name or ID</string>
+    <string name="showing_students">Showing 7 students</string>
+    <string name="no_students_found">No students found.</string>
+    <string name="no_students_in_class">No students in this class yet. Add students first.</string>
+    <string name="filter_all_classes">All classes</string>
+    <string name="add_student_plus">+ Add Student</string>
+    <string name="edit_description">Edit student</string>
+    <string name="delete_description">Delete student</string>
+    <string name="student_name_1">Abebe Kebede</string>
+    <string name="student_name_2">Almaz Tadesse</string>
+    <string name="student_name_3">Biruk Hailu</string>
+    <string name="student_name_8">Kaleab Gemechu</string>
+    <string name="student_name_9">Beka T</string>
+    <string name="student_name_10">Liya Abera</string>
+    <string name="student_name_11">Nahom Desta</string>
+
+    <string name="student_id_1">S-001</string>
+    <string name="student_id_2">S-002</string>
+    <string name="student_id_3">S-003</string>
+    <string name="student_id_4">S-101</string>
+    <string name="student_id_5">S-102</string>
+    <string name="student_id_6">S-201</string>
+    <string name="student_id_7">S-301</string>
+
+    <string name="student_info_1">S-001 · CS – 4th Year – Section 1</string>
+    <string name="student_info_2">S-002 · CS – 4th Year – Section 1</string>
+    <string name="student_info_3">S-003 · CS – 4th Year – Section 1</string>
+    <string name="student_info_4">S-101 · CS – 4th Year – Section 2</string>
+    <string name="student_info_5">S-102 · CS – 4th Year – Section 2</string>
+    <string name="student_info_6">S-201 · MRKT – 2nd Year – Section 1</string>
+    <string name="student_info_7">S-301 · BUAD – 1st Year – Section 3</string>
+
+    <string-array name="class_filter_options">
+        <item>All classes</item>
+        <item>CS – 4th Year – Section 1</item>
+        <item>CS – 4th Year – Section 2</item>
+        <item>MRKT – 2nd Year – Section 1</item>
+        <item>BUAD – 1st Year – Section 3</item>
+    </string-array>
+    <!--Add students page texts-->
+    <string name="add_student_title">Add Student</string>
+    <string name="label_class">Class</string>
+    <string name="label_student_id">Student ID</string>
+    <string name="hint_student_id">e.g. S-008</string>
+    <string name="hint_student_name">Student full name</string>
+    <string name="btn_save_add_another">Save</string>
+    <string name="btn_done">Done</string>
+
+    <string-array name="class_options">
+        <item>CS – 4th Year – Section 1</item>
+        <item>CS – 4th Year – Section 2</item>
+        <item>MRKT – 2nd Year – Section 1</item>
+        <item>BUAD– 1st Year – Section 3</item>
+    </string-array>
+
+    <!--Take attendace page texts-->
+    <string name="select_date">Select Attendance Date</string>
+    <string name="today">Today</string>
+    <string name="attendance_date">5 Nov 2026</string>
+    <string name="chip_present">Present 5</string>
+    <string name="chip_absent">Absent 1</string>
+    <string name="chip_late">Late 1</string>
+    <string name="mark_all_present">Mark All Present</string>
+    <string name="mark_p">P</string>
+    <string name="mark_a">A</string>
+    <string name="mark_l">L</string>
+    <string name="save_attendance">Save Attendance</string>
+
+    <string name="menu_sort_by">Sort by</string>
+    <string name="menu_sort_name">Name</string>
+    <string name="menu_sort_id">Student ID</string>
+    <string name="menu_show_id">Show student ID</string>
+    <string name="menu_settings">Settings</string>
+    <!--Attendance report texts-->
+    <string name="reports_title">Attendance Reports</string>
+    <string name="reports_caption">Past sessions · tap one to see each student</string>
+
+    <string name="rep_date_1">5 Nov 2026</string>
+    <string name="rep_date_2">4 Nov 2026</string>
+    <string name="rep_date_3">3 Nov 2026</string>
+    <string name="rep_date_4">31 Oct 2026</string>
+    <string name="rep_date_5">30 Oct 2026</string>
+    <string name="rep_date_6">29 Oct 2026</string>
+    <string name="rep_date_7">28 Oct 2026</string>
+
+    <string name="rep_summary_1">Present 5 · Absent 1 · Late 1</string>
+    <string name="rep_summary_2">Present 6 · Absent 1 · Late 0</string>
+    <string name="rep_summary_3">Present 7 · Absent 0 · Late 0</string>
+    <string name="rep_summary_4">Present 5 · Absent 0 · Late 2</string>
+    <string name="rep_summary_5">Present 4 · Absent 2 · Late 1</string>
+    <string name="rep_summary_6">Present 6 · Absent 0 · Late 1</string>
+    <string name="rep_summary_7">Present 6 · Absent 1 · Late 0</string>
+
+</resources>

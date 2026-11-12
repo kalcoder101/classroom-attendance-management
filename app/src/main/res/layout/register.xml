@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash_blur"
+    android:fillViewport="true"
+    tools:context=".RegisterActivity">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:clipChildren="false"
+      android:clipToPadding="false"
+      android:gravity="center_vertical"
+      android:orientation="vertical"
+      android:padding="24dp">
+
+    <!-- Centered header -->
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/logo_description"
+        android:src="@drawable/app_logo" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:text="@string/register_title"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:text="@string/register_subtitle"
+        android:textColor="@color/tagline_white"
+        android:textSize="15sp" />
+
+    <!-- Form card -->
+    <LinearLayout
+        android:id="@+id/cardRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/card"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+      <!-- Full name -->
+      <TextView
+          android:id="@+id/tvFullNameLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/label_full_name"
+          android:textColor="@color/text_primary"
+          android:textSize="14sp"
+          android:textStyle="bold" />
+
+      <EditText
+          android:id="@+id/etFullName"
+          android:layout_width="match_parent"
+          android:layout_height="50dp"
+          android:layout_marginTop="6dp"
+          android:background="@drawable/input_box"
+          android:hint="@string/hint_full_name"
+          android:autofillHints="personName"
+          android:imeOptions="actionNext"
+          android:inputType="textPersonName|textCapWords"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:textColor="@color/text_primary"
+          android:textColorHint="@color/text_hint"
+          android:textSize="16sp" />
+
+      <!-- Username or email -->
+      <TextView
+          android:id="@+id/tvUsernameLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="16dp"
+          android:text="@string/label_username_email"
+          android:textColor="@color/text_primary"
+          android:textSize="14sp"
+          android:textStyle="bold" />
+
+      <EditText
+          android:id="@+id/etUsername"
+          android:layout_width="match_parent"
+          android:layout_height="50dp"
+          android:layout_marginTop="6dp"
+          android:background="@drawable/input_box"
+          android:hint="@string/hint_username"
+          android:autofillHints="emailAddress|username"
+          android:imeOptions="actionNext"
+          android:inputType="textEmailAddress"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:textColor="@color/text_primary"
+          android:textColorHint="@color/text_hint"
+          android:textSize="16sp" />
+
+      <!-- Password -->
+      <TextView
+          android:id="@+id/tvPasswordLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="16dp"
+          android:text="@string/label_password"
+          android:textColor="@color/text_primary"
+          android:textSize="14sp"
+          android:textStyle="bold" />
+
+      <EditText
+          android:id="@+id/etPassword"
+          android:layout_width="match_parent"
+          android:layout_height="50dp"
+          android:layout_marginTop="6dp"
+          android:background="@drawable/input_box"
+          android:hint="@string/hint_password"
+          android:autofillHints="newPassword"
+          android:imeOptions="actionNext"
+          android:inputType="textPassword"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:textColor="@color/text_primary"
+          android:textColorHint="@color/text_hint"
+          android:textSize="16sp" />
+
+      <!-- Confirm password -->
+      <TextView
+          android:id="@+id/tvConfirmPasswordLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="16dp"
+          android:text="@string/label_confirm_password"
+          android:textColor="@color/text_primary"
+          android:textSize="14sp"
+          android:textStyle="bold" />
+
+      <EditText
+          android:id="@+id/etConfirmPassword"
+          android:layout_width="match_parent"
+          android:layout_height="50dp"
+          android:layout_marginTop="6dp"
+          android:background="@drawable/input_box"
+          android:hint="@string/hint_confirm_password"
+          android:autofillHints="newPassword"
+          android:imeOptions="actionDone"
+          android:inputType="textPassword"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:textColor="@color/text_primary"
+          android:textColorHint="@color/text_hint"
+          android:textSize="16sp" />
+
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/btnRegister"
+          android:layout_width="match_parent"
+          android:layout_height="52dp"
+          android:layout_marginTop="24dp"
+          android:elevation="6dp"
+          android:insetTop="0dp"
+          android:insetBottom="0dp"
+          android:stateListAnimator="@null"
+          android:text="@string/btn_register"
+          android:textAllCaps="false"
+          android:textColor="@color/white"
+          android:textSize="16sp"
+          android:textStyle="bold"
+          app:backgroundTint="@color/primary_blue"
+          app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+    <!-- Login link -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+      <TextView
+          android:id="@+id/tvAlreadyRegistered"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/already_registered"
+          android:textColor="@color/text_secondary"
+          android:textSize="15sp" />
+
+      <TextView
+          android:id="@+id/tvLoginLink"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="4dp"
+          android:padding="8dp"
+          android:text="@string/login_link"
+          android:textColor="@color/primary_blue"
+          android:textSize="15sp"
+          android:textStyle="bold" />
+    </LinearLayout>
+
+  </LinearLayout>
+</ScrollView>
