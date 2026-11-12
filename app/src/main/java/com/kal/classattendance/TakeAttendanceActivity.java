@@ -10,6 +10,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -61,6 +62,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
     // student _id -> "P" / "A" / "L", kept in sync with the radio buttons
     private final Map<Long, String> statuses = new HashMap<>();
+    // Keep track of what is currently saved in the DB for the current date
+    private final Map<Long, String> savedStatuses = new HashMap<>();
     private List<Student> students;
 
     private LinearLayout listStudents;
@@ -72,6 +75,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     private MaterialButton btnSave;
     private boolean showStudentId = true;
     private boolean sortByName = true;
+    // The roster is loaded in onCreate; later resumes only refresh it
+    private boolean firstResume = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,8 +155,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             return false;
         });
 
-        // Back arrow returns to the previous screen
-        toolbar.setNavigationOnClickListener(v -> finish());
+        // Back arrow returns to the previous screen, warning about unsaved marks
+        toolbar.setNavigationOnClickListener(v -> confirmDiscardThen(this::finish));
 
         // Date button opens a date picker; picking a date reloads that day's marks
         btnDate.setOnClickListener(v -> openDatePicker());
@@ -163,14 +168,72 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> saveAttendance());
 
         refreshDateLabel();
+
+        // Load the roster once, when the screen opens. onResume must not reload
+        // from scratch, so a phone call or an app switch keeps every mark.
+        loadStudents(false);
+
+        // System back should also ask before throwing unsaved marks away
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                confirmDiscardThen(TakeAttendanceActivity.this::finish);
+            }
+        });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("session_date", sessionDate.getTimeInMillis());
+        outState.putSerializable("statuses", (java.io.Serializable) statuses);
+        outState.putSerializable("saved_statuses", (java.io.Serializable) savedStatuses);
+        outState.putBoolean("show_id", showStudentId);
+        outState.putBoolean("sort_name", sortByName);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        long restoredDate = savedInstanceState.getLong("session_date", 0L);
+        if (restoredDate > 0L) {
+            sessionDate.setTimeInMillis(restoredDate);
+        }
+
+        Map<Long, String> restoredStatuses =
+                (Map<Long, String>) savedInstanceState.getSerializable("statuses");
+        if (restoredStatuses != null) {
+            statuses.clear();
+            statuses.putAll(restoredStatuses);
+        }
+
+        Map<Long, String> restoredSaved =
+                (Map<Long, String>) savedInstanceState.getSerializable("saved_statuses");
+        if (restoredSaved != null) {
+            savedStatuses.clear();
+            savedStatuses.putAll(restoredSaved);
+        }
+
+        showStudentId = savedInstanceState.getBoolean("show_id", showStudentId);
+        sortByName = savedInstanceState.getBoolean("sort_name", sortByName);
+        refreshDateLabel();
+
+        // Rebuild the rows so the restored marks replace the ones read from the DB
+        sortAndRenderStudents();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Reload here so students added elsewhere show up, and so a picked
-        // date always starts from what is saved in the database
-        loadStudents();
+        // Coming back to this screen: pick up roster changes (students added or
+        // removed elsewhere) but keep the marks already on screen.
+        if (firstResume) {
+            firstResume = false;
+        } else {
+            loadStudents(true);
+        }
     }
 
     private void openDatePicker() {
@@ -193,11 +256,28 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             // Read the picked date back in UTC to avoid off-by-one days
             Calendar picked = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             picked.setTimeInMillis((Long) selection);
-            sessionDate.set(picked.get(Calendar.YEAR),
+
+            Calendar newDate = (Calendar) sessionDate.clone();
+            newDate.set(picked.get(Calendar.YEAR),
                     picked.get(Calendar.MONTH),
                     picked.get(Calendar.DAY_OF_MONTH));
-            refreshDateLabel();
-            loadStudents(); // marks may differ on another day
+
+            if (isSameDay(newDate, sessionDate)) {
+                return; // same day, nothing to reload
+            }
+
+            // Switching days starts from that day's saved marks, so any unsaved
+            // marks on the current date would be lost
+            confirmDiscardThen(
+                    "Marks for " + DISPLAY_DATE.format(sessionDate.getTime())
+                            + " have not been saved. Switching to "
+                            + DISPLAY_DATE.format(newDate.getTime())
+                            + " will discard them.",
+                    () -> {
+                        sessionDate.setTimeInMillis(newDate.getTimeInMillis());
+                        refreshDateLabel();
+                        loadStudents(false); // marks may differ on another day
+                    });
         });
 
         picker.show(getSupportFragmentManager(), "date_picker");
@@ -211,9 +291,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     }
 
     private void refreshDateLabel() {
-        Calendar today = Calendar.getInstance();
-        boolean isToday = today.get(Calendar.YEAR) == sessionDate.get(Calendar.YEAR)
-                && today.get(Calendar.DAY_OF_YEAR) == sessionDate.get(Calendar.DAY_OF_YEAR);
+        boolean isToday = isSameDay(Calendar.getInstance(), sessionDate);
 
         if (isToday) {
             btnDate.setText(getString(R.string.today) + ", " + DISPLAY_DATE.format(sessionDate.getTime()));
@@ -222,25 +300,74 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         }
     }
 
-    /** Loads the class roster and fills the radio buttons from the database. */
-    private void loadStudents() {
+    private static boolean isSameDay(Calendar a, Calendar b) {
+        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR)
+                && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /**
+     * Loads the class roster and the marks saved for the current date.
+     * When {@code keepUnsavedMarks} is true, marks already on screen win over
+     * the database, so refreshing the roster cannot wipe the teacher's work.
+     */
+    private void loadStudents(boolean keepUnsavedMarks) {
+        Map<Long, String> previousMarks = new HashMap<>(statuses);
         students = studentDao.listForClass(classId);
-        statuses.clear();
 
         String dateKey = DB_DATE.format(sessionDate.getTime());
-        Map<Long, String> saved = attendanceDao.hasSession(classId, dateKey)
-                ? attendanceDao.loadRecords(attendanceDao.getOrCreateSession(classId, dateKey))
-                : new HashMap<>();
+        savedStatuses.clear();
+        if (attendanceDao.hasSession(classId, dateKey)) {
+            savedStatuses.putAll(
+                    attendanceDao.loadRecords(attendanceDao.getOrCreateSession(classId, dateKey)));
+        }
 
+        statuses.clear();
         for (Student student : students) {
-            // Unmarked students default to Present
-            String status = saved.containsKey(student.getId())
-                    ? saved.get(student.getId())
-                    : AttendanceDao.STATUS_PRESENT;
+            String status;
+            if (keepUnsavedMarks && previousMarks.containsKey(student.getId())) {
+                status = previousMarks.get(student.getId());
+            } else if (savedStatuses.containsKey(student.getId())) {
+                status = savedStatuses.get(student.getId());
+            } else {
+                // Unmarked students default to Present
+                status = AttendanceDao.STATUS_PRESENT;
+            }
             statuses.put(student.getId(), status);
         }
 
         sortAndRenderStudents();
+    }
+
+    /** true when a mark on screen differs from what is stored for this date. */
+    private boolean hasUnsavedMarks() {
+        if (students == null || students.isEmpty()) return false;
+        for (Student student : students) {
+            String saved = savedStatuses.get(student.getId());
+            if (saved == null) saved = AttendanceDao.STATUS_PRESENT;
+            String current = statuses.get(student.getId());
+            if (!saved.equals(current)) return true;
+        }
+        return false;
+    }
+
+    /** Runs the action immediately, or asks first when marks are unsaved. */
+    private void confirmDiscardThen(Runnable action) {
+        confirmDiscardThen("The marks on this screen have not been saved. "
+                + "Leaving now will discard them.", action);
+    }
+
+    /** Runs the action immediately, or asks first with the given message. */
+    private void confirmDiscardThen(String message, Runnable action) {
+        if (!hasUnsavedMarks()) {
+            action.run();
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Unsaved marks")
+                .setMessage(message)
+                .setPositiveButton("Discard", (dialog, which) -> action.run())
+                .setNegativeButton("Keep marking", null)
+                .show();
     }
 
     private void sortAndRenderStudents() {
@@ -347,6 +474,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
     /** Sets every student to a specified status and refreshes the rows + chips. */
     private void markAllStatus(String targetStatus) {
+        if (students == null) return;
         for (Student student : students) {
             statuses.put(student.getId(), targetStatus);
         }
@@ -383,7 +511,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
     /** Saves the session and every mark, then returns to the previous screen. */
     private void saveAttendance() {
-        if (students.isEmpty()) {
+        if (students == null || students.isEmpty()) {
             Toast.makeText(this, R.string.no_students_in_class, Toast.LENGTH_SHORT).show();
             return;
         }
