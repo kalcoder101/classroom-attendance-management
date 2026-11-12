@@ -3,12 +3,14 @@ package com.kal.classattendance;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -27,6 +29,10 @@ import com.kal.classattendance.util.Logout;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import android.view.MenuItem;
+import android.widget.PopupMenu;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +70,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     private TextView chipLate;
     private MaterialButton btnDate;
     private MaterialButton btnSave;
+    private boolean showStudentId = true;
+    private boolean sortByName = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,11 +116,35 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSaveAttendance);
 
         // The toolbar declares its own menu in XML (app:menu), so item clicks
-        // arrive through this listener, not onCreateOptionsMenu
+        // arrive through this listener, handling Options Menu actions
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.menu_logout) {
+            int id = item.getItemId();
+            if (id == R.id.menu_logout) {
                 Logout.go(this);
+                return true;
+            } else if (id == R.id.menu_mark_all_present) {
+                markAllPresent();
+                Toast.makeText(this, "Marked all as Present", Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (id == R.id.menu_clear_all) {
+                markAllStatus(AttendanceDao.STATUS_ABSENT);
+                Toast.makeText(this, "Marked all as Absent", Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (id == R.id.menu_sort_name) {
+                item.setChecked(true);
+                sortByName = true;
+                sortAndRenderStudents();
+                return true;
+            } else if (id == R.id.menu_sort_id) {
+                item.setChecked(true);
+                sortByName = false;
+                sortAndRenderStudents();
+                return true;
+            } else if (id == R.id.menu_show_id) {
+                showStudentId = !item.isChecked();
+                item.setChecked(showStudentId);
+                sortAndRenderStudents();
                 return true;
             }
             return false;
@@ -193,8 +225,6 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     /** Loads the class roster and fills the radio buttons from the database. */
     private void loadStudents() {
         students = studentDao.listForClass(classId);
-
-        listStudents.removeAllViews();
         statuses.clear();
 
         String dateKey = DB_DATE.format(sessionDate.getTime());
@@ -208,6 +238,24 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                     ? saved.get(student.getId())
                     : AttendanceDao.STATUS_PRESENT;
             statuses.put(student.getId(), status);
+        }
+
+        sortAndRenderStudents();
+    }
+
+    private void sortAndRenderStudents() {
+        if (students == null) return;
+
+        if (sortByName) {
+            Collections.sort(students, (a, b) -> a.getFullName().compareToIgnoreCase(b.getFullName()));
+        } else {
+            Collections.sort(students, (a, b) -> a.getStudentCode().compareToIgnoreCase(b.getStudentCode()));
+        }
+
+        listStudents.removeAllViews();
+        for (Student student : students) {
+            String status = statuses.get(student.getId());
+            if (status == null) status = AttendanceDao.STATUS_PRESENT;
             listStudents.addView(buildStudentRow(student, status));
         }
 
@@ -227,9 +275,11 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         RadioButton rbPresent = row.findViewById(R.id.rbPresent);
         RadioButton rbAbsent = row.findViewById(R.id.rbAbsent);
         RadioButton rbLate = row.findViewById(R.id.rbLate);
+        ImageView btnPopup = row.findViewById(R.id.btnStudentPopup);
 
         tvName.setText(student.getFullName());
         tvId.setText(student.getStudentCode());
+        tvId.setVisibility(showStudentId ? View.VISIBLE : View.GONE);
 
         // Apply the current status without triggering the change listener yet
         if (AttendanceDao.STATUS_ABSENT.equals(status)) {
@@ -254,20 +304,58 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             updateChips();
         });
 
+        // Popup Menu anchored to the 3-dot overflow button on this student row
+        btnPopup.setOnClickListener(v -> showStudentPopupMenu(v, student, rbPresent, rbAbsent, rbLate));
+
         return row;
+    }
+
+    /**
+     * Demonstrates PopupMenu: Shows a contextual dropdown anchored directly
+     * to the student's 3-dot icon button.
+     */
+    private void showStudentPopupMenu(View anchor, Student student,
+                                      RadioButton rbPresent, RadioButton rbAbsent, RadioButton rbLate) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenuInflater().inflate(R.menu.menu_student_popup, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.action_mark_present) {
+                rbPresent.setChecked(true);
+                return true;
+            } else if (id == R.id.action_mark_absent) {
+                rbAbsent.setChecked(true);
+                return true;
+            } else if (id == R.id.action_mark_late) {
+                rbLate.setChecked(true);
+                return true;
+            } else if (id == R.id.action_student_details) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Student Info")
+                        .setMessage("Name: " + student.getFullName() + "\n"
+                                + "ID: " + student.getStudentCode() + "\n"
+                                + "Class: " + classLabel + "\n"
+                                + "Current Mark: " + statuses.get(student.getId()))
+                        .setPositiveButton("OK", null)
+                        .show();
+                return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    /** Sets every student to a specified status and refreshes the rows + chips. */
+    private void markAllStatus(String targetStatus) {
+        for (Student student : students) {
+            statuses.put(student.getId(), targetStatus);
+        }
+        sortAndRenderStudents();
     }
 
     /** Sets every student to Present and refreshes the rows + chips. */
     private void markAllPresent() {
-        for (Student student : students) {
-            statuses.put(student.getId(), AttendanceDao.STATUS_PRESENT);
-        }
-        // Simple approach: rebuild the rows so the radios reflect the map
-        for (int i = 0; i < students.size(); i++) {
-            View row = listStudents.getChildAt(i);
-            ((RadioButton) row.findViewById(R.id.rbPresent)).setChecked(true);
-        }
-        updateChips();
+        markAllStatus(AttendanceDao.STATUS_PRESENT);
     }
 
     /** Present / Absent / Late counters under the class name. */

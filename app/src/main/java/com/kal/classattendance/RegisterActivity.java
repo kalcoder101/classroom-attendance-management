@@ -1,7 +1,11 @@
 package com.kal.classattendance;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +19,8 @@ import com.kal.classattendance.data.TeacherDao;
 public class RegisterActivity extends AppCompatActivity {
 
     private TeacherDao teacherDao;
+    private boolean isPasswordVisible = false;
+    private boolean isConfirmPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +28,10 @@ public class RegisterActivity extends AppCompatActivity {
         WindowCompat.enableEdgeToEdge(getWindow());
         setContentView(R.layout.register);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomPadding = Math.max(bars.bottom, ime.bottom);
+            v.setPadding(bars.left, bars.top, bars.right, bottomPadding);
             return insets;
         });
 
@@ -33,6 +41,33 @@ public class RegisterActivity extends AppCompatActivity {
         EditText etUsername = findViewById(R.id.etUsername);
         EditText etPassword = findViewById(R.id.etPassword);
         EditText etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        ImageView btnTogglePassword = findViewById(R.id.btnTogglePassword);
+        ImageView btnToggleConfirmPassword = findViewById(R.id.btnToggleConfirmPassword);
+
+        // Password visibility toggles
+        btnTogglePassword.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                btnTogglePassword.setImageResource(R.drawable.ic_visibility_off);
+            } else {
+                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                btnTogglePassword.setImageResource(R.drawable.ic_visibility);
+            }
+            etPassword.setSelection(etPassword.getText().length());
+        });
+
+        btnToggleConfirmPassword.setOnClickListener(v -> {
+            isConfirmPasswordVisible = !isConfirmPasswordVisible;
+            if (isConfirmPasswordVisible) {
+                etConfirmPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                btnToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_off);
+            } else {
+                etConfirmPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                btnToggleConfirmPassword.setImageResource(R.drawable.ic_visibility);
+            }
+            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
+        });
 
         // "Log in" link goes back to the login screen that opened this form
         findViewById(R.id.tvLoginLink).setOnClickListener(v -> finish());

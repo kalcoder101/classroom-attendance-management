@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/ctx_edit_student"
+        android:title="Edit Student" />
+    <item
+        android:id="@+id/ctx_view_attendance"
+        android:title="Take / View Attendance" />
+    <item
+        android:id="@+id/ctx_delete_student"
+        android:title="Delete Student" />
+</menu>

@@ -62,6 +62,18 @@
             app:iconTint="@color/white"
             app:strokeColor="@color/white"
             app:strokeWidth="1.2dp" />
+
+        <ImageView
+            android:id="@+id/btnLogout"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/logout"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_logout" />
     </LinearLayout>
 
     <!-- Scrollable content -->

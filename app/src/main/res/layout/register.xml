@@ -125,21 +125,38 @@
           android:textSize="14sp"
           android:textStyle="bold" />
 
-      <EditText
-          android:id="@+id/etPassword"
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="50dp"
-          android:layout_marginTop="6dp"
-          android:background="@drawable/input_box"
-          android:hint="@string/hint_password"
-          android:autofillHints="newPassword"
-          android:imeOptions="actionNext"
-          android:inputType="textPassword"
-          android:paddingStart="16dp"
-          android:paddingEnd="16dp"
-          android:textColor="@color/text_primary"
-          android:textColorHint="@color/text_hint"
-          android:textSize="16sp" />
+          android:layout_marginTop="6dp">
+
+          <EditText
+              android:id="@+id/etPassword"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/input_box"
+              android:hint="@string/hint_password"
+              android:autofillHints="newPassword"
+              android:imeOptions="actionNext"
+              android:inputType="textPassword"
+              android:paddingStart="16dp"
+              android:paddingEnd="48dp"
+              android:textColor="@color/text_primary"
+              android:textColorHint="@color/text_hint"
+              android:textSize="16sp" />
+
+          <ImageView
+              android:id="@+id/btnTogglePassword"
+              android:layout_width="48dp"
+              android:layout_height="match_parent"
+              android:layout_gravity="end|center_vertical"
+              android:background="?attr/selectableItemBackgroundBorderless"
+              android:clickable="true"
+              android:contentDescription="Toggle password visibility"
+              android:focusable="true"
+              android:padding="12dp"
+              android:src="@drawable/ic_visibility" />
+      </FrameLayout>
 
       <!-- Confirm password -->
       <TextView
@@ -152,21 +169,38 @@
           android:textSize="14sp"
           android:textStyle="bold" />
 
-      <EditText
-          android:id="@+id/etConfirmPassword"
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="50dp"
-          android:layout_marginTop="6dp"
-          android:background="@drawable/input_box"
-          android:hint="@string/hint_confirm_password"
-          android:autofillHints="newPassword"
-          android:imeOptions="actionDone"
-          android:inputType="textPassword"
-          android:paddingStart="16dp"
-          android:paddingEnd="16dp"
-          android:textColor="@color/text_primary"
-          android:textColorHint="@color/text_hint"
-          android:textSize="16sp" />
+          android:layout_marginTop="6dp">
+
+          <EditText
+              android:id="@+id/etConfirmPassword"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/input_box"
+              android:hint="@string/hint_confirm_password"
+              android:autofillHints="newPassword"
+              android:imeOptions="actionDone"
+              android:inputType="textPassword"
+              android:paddingStart="16dp"
+              android:paddingEnd="48dp"
+              android:textColor="@color/text_primary"
+              android:textColorHint="@color/text_hint"
+              android:textSize="16sp" />
+
+          <ImageView
+              android:id="@+id/btnToggleConfirmPassword"
+              android:layout_width="48dp"
+              android:layout_height="match_parent"
+              android:layout_gravity="end|center_vertical"
+              android:background="?attr/selectableItemBackgroundBorderless"
+              android:clickable="true"
+              android:contentDescription="Toggle confirm password visibility"
+              android:focusable="true"
+              android:padding="12dp"
+              android:src="@drawable/ic_visibility" />
+      </FrameLayout>
 
       <com.google.android.material.button.MaterialButton
           android:id="@+id/btnRegister"

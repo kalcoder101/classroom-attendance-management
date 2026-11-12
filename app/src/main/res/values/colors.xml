@@ -11,13 +11,13 @@
     <color name="text_muted">#D1E0FC</color>
     <!--Login activity colors -->
 
-    <color name="text_primary">#1F2633</color>
-    <color name="text_secondary">#5F6878</color>
-    <color name="text_hint">#7A7F8A</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_hint">#64748B</color>
 
     <color name="background_light">#EEF2F9</color>
-    <color name="border_gray">#6B7488</color>
-    <color name="input_fill">#F7F9FC</color>
+    <color name="border_gray">#CBD5E1</color>
+    <color name="input_fill">#F8FAFC</color>
     <!--Dashboards colors-->
     <color name="icon_tile">#E3EDFC</color>
     <color name="divider_gray">#D9DEE8</color>

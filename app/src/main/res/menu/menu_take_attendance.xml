@@ -2,14 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Sort by" label (disabled, so it only works as a heading) -->
     <item
-        android:id="@+id/menu_sort_header"
-        android:enabled="false"
-        android:title="@string/menu_sort_by"
+        android:id="@+id/menu_mark_all_present"
+        android:title="Mark All Present"
         app:showAsAction="never" />
 
-    <!-- Radio choice: only one can be selected -->
+    <item
+        android:id="@+id/menu_clear_all"
+        android:title="Mark All Absent"
+        app:showAsAction="never" />
+
+    <!-- Radio choice: Sort order -->
     <group
         android:id="@+id/group_sort"
         android:checkableBehavior="single">
@@ -24,17 +27,12 @@
             app:showAsAction="never" />
     </group>
 
-    <!-- Checkbox -->
+    <!-- Checkbox to toggle Student ID visibility -->
     <item
         android:id="@+id/menu_show_id"
         android:checkable="true"
         android:checked="true"
         android:title="@string/menu_show_id"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
         app:showAsAction="never" />
 
     <item

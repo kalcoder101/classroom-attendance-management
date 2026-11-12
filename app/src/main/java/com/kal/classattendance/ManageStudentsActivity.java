@@ -125,6 +125,12 @@ public class ManageStudentsActivity extends AppCompatActivity {
 
         // Back arrow returns to the previous screen
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        // Logout icon
+        View btnLogout = findViewById(R.id.btnLogout);
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> com.kal.classattendance.util.Logout.go(this));
+        }
     }
 
     @Override

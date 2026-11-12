@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_mark_present"
+        android:title="Mark Present" />
+    <item
+        android:id="@+id/action_mark_absent"
+        android:title="Mark Absent" />
+    <item
+        android:id="@+id/action_mark_late"
+        android:title="Mark Late" />
+    <item
+        android:id="@+id/action_student_details"
+        android:title="Student Info" />
+</menu>

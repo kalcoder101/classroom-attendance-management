@@ -2,7 +2,10 @@ package com.kal.classattendance;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final String EXTRA_TEACHER_NAME = "teacher_name";
 
     private TeacherDao teacherDao;
+    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +33,10 @@ public class LoginActivity extends AppCompatActivity {
         WindowCompat.enableEdgeToEdge(getWindow());
         setContentView(R.layout.login);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomPadding = Math.max(bars.bottom, ime.bottom);
+            v.setPadding(bars.left, bars.top, bars.right, bottomPadding);
             return insets;
         });
 
@@ -38,6 +44,20 @@ public class LoginActivity extends AppCompatActivity {
 
         EditText etUsername = findViewById(R.id.etUsername);
         EditText etPassword = findViewById(R.id.etPassword);
+        ImageView btnTogglePassword = findViewById(R.id.btnTogglePassword);
+
+        // Password visibility toggle
+        btnTogglePassword.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                btnTogglePassword.setImageResource(R.drawable.ic_visibility_off);
+            } else {
+                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                btnTogglePassword.setImageResource(R.drawable.ic_visibility);
+            }
+            etPassword.setSelection(etPassword.getText().length());
+        });
 
         // Register link under the card opens the registration form
         TextView tvRegister = findViewById(R.id.tvRegister);
