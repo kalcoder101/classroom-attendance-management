@@ -159,6 +159,11 @@
     <string name="menu_sort_id">Student ID</string>
     <string name="menu_show_id">Show student ID</string>
     <string name="menu_settings">Settings</string>
+    <!--Saved attendance notification-->
+    <string name="notification_channel_name">Attendance updates</string>
+    <string name="notification_channel_description">Posted when attendance is saved</string>
+    <string name="attendance_saved_title">Attendance saved</string>
+    <string name="attendance_saved_summary">%1$s: %2$d P, %3$d A, %4$d L</string>
     <!--Attendance report texts-->
     <string name="reports_title">Attendance Reports</string>
     <string name="reports_caption">Past sessions · tap one to edit marks</string>

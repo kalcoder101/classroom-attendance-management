@@ -1,11 +1,15 @@
 package com.kal.classattendance;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -48,6 +52,14 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView tvLastChipAbsent;
     private TextView tvLastChipLate;
 
+    /** Refreshes the dashboard as soon as attendance is saved anywhere in the app. */
+    private final BroadcastReceiver attendanceSavedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            refreshDashboardData();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +97,13 @@ public class DashboardActivity extends AppCompatActivity {
         tvLastChipPresent = findViewById(R.id.tvLastChipPresent);
         tvLastChipAbsent = findViewById(R.id.tvLastChipAbsent);
         tvLastChipLate = findViewById(R.id.tvLastChipLate);
+
+        // Registered for the activity's whole life: the dashboard usually sits
+        // in the back stack while attendance is taken, so it is already current
+        // when the teacher comes back to it.
+        ContextCompat.registerReceiver(this, attendanceSavedReceiver,
+                new IntentFilter(TakeAttendanceActivity.ACTION_ATTENDANCE_SAVED),
+                ContextCompat.RECEIVER_NOT_EXPORTED);
 
         setupTopGreetings();
 
@@ -125,6 +144,16 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshDashboardData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(attendanceSavedReceiver);
+        } catch (IllegalArgumentException ignored) {
+            // Already unregistered
+        }
+        super.onDestroy();
     }
 
     private void setupTopGreetings() {

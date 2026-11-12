@@ -1,5 +1,9 @@
 package com.kal.classattendance;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,8 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -26,6 +32,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.kal.classattendance.data.AttendanceDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.model.Student;
+import com.kal.classattendance.util.AttendanceNotifier;
 import com.kal.classattendance.util.Logout;
 
 import java.text.SimpleDateFormat;
@@ -53,9 +60,16 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     private LayoutInflater inflater;
 
     private long classId;
+    private long teacherId;
     private String classLabel;
 
     public static final String EXTRA_SESSION_DATE = "session_date";
+
+    /** Sent after a successful save so listening screens can refresh their data. */
+    public static final String ACTION_ATTENDANCE_SAVED =
+            "com.kal.classattendance.action.ATTENDANCE_SAVED";
+
+    private static final int REQUEST_NOTIFICATIONS = 101;
 
     // The date this session belongs to; changing it reloads saved marks
     private Calendar sessionDate = Calendar.getInstance();
@@ -94,6 +108,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         inflater = LayoutInflater.from(this);
 
         classId = getIntent().getLongExtra(ClassListActivity.EXTRA_CLASS_ID, -1);
+        teacherId = getIntent().getLongExtra(LoginActivity.EXTRA_TEACHER_ID, -1);
         classLabel = getIntent().getStringExtra(ClassListActivity.EXTRA_CLASS_NAME);
         if (classLabel == null || classLabel.isEmpty()) {
             classLabel = getString(R.string.take_attendance);
@@ -172,6 +187,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         // Load the roster once, when the screen opens. onResume must not reload
         // from scratch, so a phone call or an app switch keeps every mark.
         loadStudents(false);
+
+        // The saved-session notification needs POST_NOTIFICATIONS on API 33+
+        requestNotificationPermissionIfNeeded();
 
         // System back should also ask before throwing unsaved marks away
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -486,8 +504,18 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         markAllStatus(AttendanceDao.STATUS_PRESENT);
     }
 
-    /** Present / Absent / Late counters under the class name. */
-    private void updateChips() {
+    /** POST_NOTIFICATIONS is a runtime permission; ask once when the screen opens. */
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATIONS);
+        }
+    }
+
+    /** Present / Absent / Late totals for the marks currently on screen. */
+    private int[] statusCounts() {
         int present = 0;
         int absent = 0;
         int late = 0;
@@ -504,9 +532,15 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                     break;
             }
         }
-        chipPresent.setText("Present " + present);
-        chipAbsent.setText("Absent " + absent);
-        chipLate.setText("Late " + late);
+        return new int[]{present, absent, late};
+    }
+
+    /** Present / Absent / Late counters under the class name. */
+    private void updateChips() {
+        int[] counts = statusCounts();
+        chipPresent.setText("Present " + counts[0]);
+        chipAbsent.setText("Absent " + counts[1]);
+        chipLate.setText("Late " + counts[2]);
     }
 
     /** Saves the session and every mark, then returns to the previous screen. */
@@ -521,6 +555,15 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         boolean saved = attendanceDao.saveRecords(sessionId, statuses);
 
         if (saved) {
+            int[] counts = statusCounts();
+
+            // Summary notification; tapping it opens the class's report
+            AttendanceNotifier.notifySaved(this, teacherId, classId, classLabel,
+                    counts[0], counts[1], counts[2]);
+
+            // Tell screens that may be open behind this one that data changed
+            sendBroadcast(new Intent(ACTION_ATTENDANCE_SAVED).setPackage(getPackageName()));
+
             Toast.makeText(this, "Attendance saved for "
                     + students.size() + (students.size() == 1 ? " student" : " students"),
                     Toast.LENGTH_SHORT).show();
