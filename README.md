@@ -61,7 +61,7 @@ This project strictly adheres to course requirements by implementing all four st
 |---|---|---|---|
 | **Dialog** | `AlertDialog` & Custom Views | `ManageStudentsActivity`, `ClassListActivity`, `TakeAttendanceActivity` | Custom edit dialogs (`dialog_edit_student.xml`, `dialog_edit_class.xml`), deletion confirmation dialogs, and student info dialogs. |
 | **Options Menu** | `menu_take_attendance.xml` | `TakeAttendanceActivity` (App Bar 3-dot overflow) | Bulk "Mark All Present", "Mark All Absent", radio group "Sort by Name / ID", and checkbox "Show/Hide Student ID". |
-| **Context Menu** | `menu_student_context.xml` | `ManageStudentsActivity` (Long-press student row) | Floating contextual menu titled with the student's name and ID: "Edit Student", "Take / View Attendance", and "Delete Student". |
+| **Context Menu** | `menu_student_context.xml` | `ManageStudentsActivity` (Long-press student row) | Floating contextual menu titled with the student's name and ID: "Edit Student", "View Attendance", and "Delete Student". |
 | **Popup Menu** | `android.widget.PopupMenu` | `TakeAttendanceActivity` (Row 3-dot button) | Anchored dropdown on each student row: "Mark Present", "Mark Absent", "Mark Late", and "Student Info". |
 
 ---

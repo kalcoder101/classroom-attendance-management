@@ -151,7 +151,7 @@ toolbar.setOnMenuItemClickListener(item -> {
 - Intercepts `onCreateContextMenu` to dynamically configure the floating header with the selected student's full name and student code.
 - Offers three contextual options:
   1. **Edit Student**: Opens the custom edit dialog preloaded with the student's information.
-  2. **Take / View Attendance**: Direct shortcut launching `TakeAttendanceActivity` pre-filtered for that student's enrolled class.
+  2. **View Attendance**: Shows that student's saved attendance for their class — session count, Present / Absent / Late totals, attendance rate and an at-risk note below 75%.
   3. **Delete Student**: Triggers safety confirmation dialog before removing the record.
 
 #### Visual Evidence
@@ -166,7 +166,7 @@ toolbar.setOnMenuItemClickListener(item -> {
         android:title="Edit Student" />
     <item
         android:id="@+id/ctx_view_attendance"
-        android:title="Take / View Attendance" />
+        android:title="View Attendance" />
     <item
         android:id="@+id/ctx_delete_student"
         android:title="Delete Student" />
@@ -201,10 +201,7 @@ public boolean onContextItemSelected(MenuItem item) {
         showEditDialog(selectedStudentForContextMenu);
         return true;
     } else if (id == R.id.ctx_view_attendance) {
-        Intent intent = new Intent(this, TakeAttendanceActivity.class);
-        intent.putExtra(LoginActivity.EXTRA_TEACHER_ID, teacherId);
-        intent.putExtra(ClassListActivity.EXTRA_CLASS_ID, selectedStudentForContextMenu.getClassId());
-        startActivity(intent);
+        showAttendanceHistory(selectedStudentForContextMenu);
         return true;
     } else if (id == R.id.ctx_delete_student) {
         confirmDeleteStudent(selectedStudentForContextMenu);

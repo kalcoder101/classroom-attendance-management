@@ -23,17 +23,27 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.kal.classattendance.data.AttendanceDao;
+import com.kal.classattendance.data.AttendanceDao.StudentRosterStat;
 import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.model.SchoolClass;
 import com.kal.classattendance.model.Student;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ManageStudentsActivity extends AppCompatActivity {
 
+    // yyyy-MM-dd is how dates are stored in the database
+    private static final SimpleDateFormat DB_DATE =
+            new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
     private StudentDao studentDao;
+    private AttendanceDao attendanceDao;
     private long teacherId;
 
     // All of this teacher's classes; index 0 of the spinner is the "All classes" filter
@@ -62,6 +72,7 @@ public class ManageStudentsActivity extends AppCompatActivity {
         teacherId = getIntent().getLongExtra(LoginActivity.EXTRA_TEACHER_ID, -1);
         long openedClassId = getIntent().getLongExtra(ClassListActivity.EXTRA_CLASS_ID, -1);
         studentDao = new StudentDao(this);
+        attendanceDao = new AttendanceDao(this);
         inflater = LayoutInflater.from(this);
 
         spClassFilter = findViewById(R.id.spClassFilter);
@@ -234,10 +245,7 @@ public class ManageStudentsActivity extends AppCompatActivity {
             showEditDialog(selectedStudentForContextMenu);
             return true;
         } else if (id == R.id.ctx_view_attendance) {
-            Intent intent = new Intent(this, TakeAttendanceActivity.class);
-            intent.putExtra(LoginActivity.EXTRA_TEACHER_ID, teacherId);
-            intent.putExtra(ClassListActivity.EXTRA_CLASS_ID, selectedStudentForContextMenu.getClassId());
-            startActivity(intent);
+            showAttendanceHistory(selectedStudentForContextMenu);
             return true;
         } else if (id == R.id.ctx_delete_student) {
             confirmDeleteStudent(selectedStudentForContextMenu);
@@ -245,6 +253,48 @@ public class ManageStudentsActivity extends AppCompatActivity {
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Shows what the saved sessions say about this student: how many times they
+     * were present, absent or late, and their attendance rate so far.
+     */
+    private void showAttendanceHistory(Student student) {
+        StudentRosterStat stat = null;
+        for (StudentRosterStat candidate
+                : attendanceDao.getStudentRosterStats(teacherId, student.getClassId())) {
+            if (candidate.studentId == student.getId()) {
+                stat = candidate;
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(student.getFullName() + " (" + student.getStudentCode() + ")")
+                .setMessage(formatAttendanceHistory(stat))
+                .setPositiveButton("Close", null)
+                .show();
+    }
+
+    /** Body of the attendance history dialog, built from the session records. */
+    static String formatAttendanceHistory(StudentRosterStat stat) {
+        if (stat == null || stat.totalSessions == 0) {
+            return "No attendance has been recorded for this student yet.";
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("Class: ").append(stat.classLabel).append("\n")
+                .append("Sessions: ").append(stat.totalSessions).append("\n\n")
+                .append("Present: ").append(stat.presentCount).append("\n")
+                .append("Absent: ").append(stat.absentCount).append("\n")
+                .append("Late: ").append(stat.lateCount).append("\n\n")
+                .append(String.format(Locale.US, "Attendance rate: %.1f%%", stat.attendanceRate));
+        if (stat.isAtRisk()) {
+            message.append("\n\nAt risk: attendance is below ")
+                    .append(Math.round(AttendanceDao.AT_RISK_THRESHOLD))
+                    .append("%");
+        }
+        return message.toString();
     }
 
     private void showEditDialog(Student student) {
@@ -309,17 +359,71 @@ public class ManageStudentsActivity extends AppCompatActivity {
                 return;
             }
 
-            boolean updated = studentDao.update(student.getId(), newClassId, newCode, newName);
-            if (updated) {
-                Toast.makeText(this, "Student updated successfully", Toast.LENGTH_SHORT).show();
-                allStudents = studentDao.listForTeacher(teacherId);
-                renderStudents();
-                dialog.dismiss();
-            } else {
-                Toast.makeText(this, "Failed to update student", Toast.LENGTH_SHORT).show();
+            if (newClassId != student.getClassId()) {
+                confirmMoveStudent(student, newClassId, newCode, newName, dialog);
+                return;
             }
+
+            applyStudentEdit(student, newClassId, newCode, newName, dialog);
         });
 
         dialog.show();
+    }
+
+    /**
+     * Moving a student keeps earlier marks with the old class, so ask first and
+     * explain that only marks from today onward follow them to the new class.
+     */
+    private void confirmMoveStudent(Student student, long newClassId, String newCode,
+                                    String newName, AlertDialog dialog) {
+        String oldLabel = student.getClassLabel() != null
+                ? student.getClassLabel() : "the old class";
+        String newLabel = classLabelFor(newClassId);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Move student")
+                .setMessage("Move " + student.getFullName() + " to " + newLabel + "?\n\n"
+                        + "Marks from today onward are copied to the new class. "
+                        + "Earlier attendance stays with " + oldLabel + ".")
+                .setPositiveButton("Move student", (d, w) ->
+                        applyStudentEdit(student, newClassId, newCode, newName, dialog))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** Saves the edited details, copying the move's attendance across if needed. */
+    private void applyStudentEdit(Student student, long newClassId, String newCode,
+                                  String newName, AlertDialog dialog) {
+        long oldClassId = student.getClassId();
+        boolean updated = studentDao.update(student.getId(), newClassId, newCode, newName);
+        if (!updated) {
+            Toast.makeText(this, "Failed to update student", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = "Student updated successfully";
+        if (newClassId != oldClassId) {
+            String today = DB_DATE.format(new Date());
+            int copied = attendanceDao.copyRecordsFromDate(
+                    student.getId(), oldClassId, newClassId, today);
+            message = copied > 0
+                    ? "Student moved, " + copied + (copied == 1 ? " mark" : " marks")
+                            + " copied to the new class"
+                    : "Student moved to the new class";
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        allStudents = studentDao.listForTeacher(teacherId);
+        renderStudents();
+        dialog.dismiss();
+    }
+
+    private String classLabelFor(long classId) {
+        for (SchoolClass c : classes) {
+            if (c.getId() == classId) {
+                return c.getLabel();
+            }
+        }
+        return "the new class";
     }
 }

@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -80,6 +81,58 @@ public class AttendanceDao {
         }
     }
 
+    /**
+     * Copies a student's marks from sessions of their old class dated on or
+     * after {@code fromDate} into the matching sessions of the new class,
+     * creating those sessions when needed. Marks the new class already has for
+     * that date are left alone. Returns how many marks were copied.
+     */
+    public int copyRecordsFromDate(long studentId, long oldClassId, long newClassId, String fromDate) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        // date -> status for the marks that should follow the student
+        Map<String, String> marksByDate = new LinkedHashMap<>();
+        String sql = "SELECT s." + COL_SESSION_DATE + ", r." + COL_STATUS
+                + " FROM " + TABLE_RECORDS + " r"
+                + " JOIN " + TABLE_SESSIONS + " s ON s." + COL_ID + " = r." + COL_SESSION_ID
+                + " WHERE r." + COL_STUDENT_ID + " = ?"
+                + " AND s." + COL_CLASS_ID + " = ?"
+                + " AND s." + COL_SESSION_DATE + " >= ?";
+        try (Cursor c = db.rawQuery(sql, new String[]{
+                String.valueOf(studentId), String.valueOf(oldClassId), fromDate})) {
+            while (c.moveToNext()) {
+                marksByDate.put(c.getString(0), c.getString(1));
+            }
+        }
+        if (marksByDate.isEmpty()) {
+            return 0;
+        }
+
+        int copied = 0;
+        db.beginTransaction();
+        try {
+            for (Map.Entry<String, String> entry : marksByDate.entrySet()) {
+                long sessionId = getOrCreateSession(newClassId, entry.getKey());
+                if (sessionId == -1) {
+                    continue;
+                }
+                ContentValues values = new ContentValues();
+                values.put(COL_SESSION_ID, sessionId);
+                values.put(COL_STUDENT_ID, studentId);
+                values.put(COL_STATUS, entry.getValue());
+                long row = db.insertWithOnConflict(TABLE_RECORDS, null, values,
+                        SQLiteDatabase.CONFLICT_IGNORE);
+                if (row != -1) {
+                    copied++;
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return copied;
+    }
+
     /** Saved statuses for this session: student_id -> "P" / "A" / "L". */
     public Map<Long, String> loadRecords(long sessionId) {
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -99,6 +152,27 @@ public class AttendanceDao {
     /** true when this class already has attendance saved for the given date. */
     public boolean hasSession(long classId, String sessionDate) {
         return findSessionId(helper.getReadableDatabase(), classId, sessionDate) != -1;
+    }
+
+    // ==================== Attendance Rule ====================
+
+    /**
+     * The single attendance-rate rule: a student attended when they were
+     * present or late, and only absences count against them. Everything that
+     * shows or judges a rate goes through this method.
+     */
+    public static float attendanceRate(int present, int late, int total) {
+        if (total <= 0) {
+            return 0f;
+        }
+        return ((float) (present + late) / total) * 100f;
+    }
+
+    /** Below this rate a student is reported as at risk (in percent). */
+    public static final float AT_RISK_THRESHOLD = 75f;
+
+    public static boolean isBelowAtRiskThreshold(int present, int late, int total) {
+        return total > 0 && attendanceRate(present, late, total) < AT_RISK_THRESHOLD;
     }
 
     // ==================== Reports & Analytics Support ====================
@@ -136,8 +210,7 @@ public class AttendanceDao {
         public int getTotalStudents() { return totalStudents; }
 
         public float getAttendanceRate() {
-            if (totalStudents == 0) return 0f;
-            return ((float) presentCount / totalStudents) * 100f;
+            return AttendanceDao.attendanceRate(presentCount, lateCount, totalStudents);
         }
     }
 
@@ -155,7 +228,7 @@ public class AttendanceDao {
             this.totalAbsent = totalAbsent;
             this.totalLate = lateCountClean(totalLate);
             this.totalRecords = totalPresent + totalAbsent + this.totalLate;
-            this.attendanceRate = totalRecords > 0 ? ((float) totalPresent / totalRecords) * 100f : 0f;
+            this.attendanceRate = AttendanceDao.attendanceRate(totalPresent, this.totalLate, totalRecords);
         }
 
         private static int lateCountClean(int late) {
@@ -199,11 +272,11 @@ public class AttendanceDao {
             this.absentCount = absentCount;
             this.lateCount = lateCount;
             this.totalSessions = presentCount + absentCount + lateCount;
-            this.attendanceRate = totalSessions > 0 ? ((float) presentCount / totalSessions) * 100f : 0f;
+            this.attendanceRate = AttendanceDao.attendanceRate(presentCount, lateCount, totalSessions);
         }
 
         public boolean isAtRisk() {
-            return totalSessions > 0 && attendanceRate < 75.0f;
+            return AttendanceDao.isBelowAtRiskThreshold(presentCount, lateCount, totalSessions);
         }
     }
 
@@ -336,12 +409,19 @@ public class AttendanceDao {
            .append("c.").append(COL_DEPARTMENT).append(", ")
            .append("c.").append(COL_YEAR).append(", ")
            .append("c.").append(COL_SECTION).append(", ")
-           .append("SUM(CASE WHEN r.").append(COL_STATUS).append(" = 'P' THEN 1 ELSE 0 END) AS count_p, ")
-           .append("SUM(CASE WHEN r.").append(COL_STATUS).append(" = 'A' THEN 1 ELSE 0 END) AS count_a, ")
-           .append("SUM(CASE WHEN r.").append(COL_STATUS).append(" = 'L' THEN 1 ELSE 0 END) AS count_l ")
+           // A moved student's marks belong to the class of their session, so
+           // only sessions of their current class are counted here; marks from
+           // the old class stay in that class's records and reports.
+           .append("SUM(CASE WHEN s.").append(COL_CLASS_ID).append(" = st.").append(COL_CLASS_ID)
+                   .append(" AND r.").append(COL_STATUS).append(" = 'P' THEN 1 ELSE 0 END) AS count_p, ")
+           .append("SUM(CASE WHEN s.").append(COL_CLASS_ID).append(" = st.").append(COL_CLASS_ID)
+                   .append(" AND r.").append(COL_STATUS).append(" = 'A' THEN 1 ELSE 0 END) AS count_a, ")
+           .append("SUM(CASE WHEN s.").append(COL_CLASS_ID).append(" = st.").append(COL_CLASS_ID)
+                   .append(" AND r.").append(COL_STATUS).append(" = 'L' THEN 1 ELSE 0 END) AS count_l ")
            .append("FROM ").append(TABLE_STUDENTS).append(" st ")
            .append("JOIN ").append(TABLE_CLASSES).append(" c ON c.").append(COL_ID).append(" = st.").append(COL_CLASS_ID).append(" ")
            .append("LEFT JOIN ").append(TABLE_RECORDS).append(" r ON r.").append(COL_STUDENT_ID).append(" = st.").append(COL_ID).append(" ")
+           .append("LEFT JOIN ").append(TABLE_SESSIONS).append(" s ON s.").append(COL_ID).append(" = r.").append(COL_SESSION_ID).append(" ")
            .append("WHERE c.").append(COL_TEACHER_ID).append(" = ? ");
 
         java.util.List<String> args = new java.util.ArrayList<>();

@@ -5,7 +5,7 @@
         android:title="Edit Student" />
     <item
         android:id="@+id/ctx_view_attendance"
-        android:title="Take / View Attendance" />
+        android:title="View Attendance" />
     <item
         android:id="@+id/ctx_delete_student"
         android:title="Delete Student" />

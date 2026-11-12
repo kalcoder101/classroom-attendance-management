@@ -177,7 +177,8 @@ public class ReportsActivity extends AppCompatActivity {
         cardSessions.setVisibility(hasSessions ? View.VISIBLE : View.GONE);
         cardChart.setVisibility(hasSessions ? View.VISIBLE : View.GONE);
         tvEmptySessions.setVisibility(hasSessions ? View.GONE : View.VISIBLE);
-        btnExportPdf.setEnabled(true);
+        // Nothing to export when there are no sessions
+        btnExportPdf.setEnabled(hasSessions);
 
         if (hasSessions) {
             LayoutInflater inflater = LayoutInflater.from(this);
