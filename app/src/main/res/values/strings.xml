@@ -152,7 +152,16 @@
     <string name="menu_settings">Settings</string>
     <!--Attendance report texts-->
     <string name="reports_title">Attendance Reports</string>
-    <string name="reports_caption">Past sessions · tap one to see each student</string>
+    <string name="reports_caption">Past sessions · tap one to edit marks</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="generating_pdf">Generating PDF report…</string>
+    <string name="pdf_exported">Report PDF saved</string>
+    <string name="pdf_export_failed">Could not export PDF</string>
+    <string name="overall_attendance">Overall Attendance</string>
+    <string name="total_sessions">Total Sessions</string>
+    <string name="attendance_trend">Attendance Rate Trend</string>
+    <string name="no_sessions_recorded">No attendance sessions recorded yet for this selection.</string>
+    <string name="all_classes">All Classes</string>
 
     <string name="rep_date_1">5 Nov 2026</string>
     <string name="rep_date_2">4 Nov 2026</string>

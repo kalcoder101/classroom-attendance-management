@@ -48,6 +48,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     private long classId;
     private String classLabel;
 
+    public static final String EXTRA_SESSION_DATE = "session_date";
+
     // The date this session belongs to; changing it reloads saved marks
     private Calendar sessionDate = Calendar.getInstance();
 
@@ -82,6 +84,16 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         classLabel = getIntent().getStringExtra(ClassListActivity.EXTRA_CLASS_NAME);
         if (classLabel == null || classLabel.isEmpty()) {
             classLabel = getString(R.string.take_attendance);
+        }
+
+        String initialDateStr = getIntent().getStringExtra(EXTRA_SESSION_DATE);
+        if (initialDateStr != null && !initialDateStr.isEmpty()) {
+            try {
+                java.util.Date parsed = DB_DATE.parse(initialDateStr);
+                if (parsed != null) {
+                    sessionDate.setTime(parsed);
+                }
+            } catch (Exception ignored) {}
         }
 
         TextView tvClassName = findViewById(R.id.tvClassName);

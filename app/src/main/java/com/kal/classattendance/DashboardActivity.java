@@ -65,7 +65,49 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Reports opens the dynamic reports & analytics screen
+        findViewById(R.id.cardReports).setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, ReportsActivity.class);
+            intent.putExtra(ReportsActivity.EXTRA_TEACHER_ID, teacherId);
+            startActivity(intent);
+        });
+
         // Logout icon returns to the login screen and clears the back stack
         findViewById(R.id.btnLogout).setOnClickListener(v -> Logout.go(this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateLastAttendanceCard();
+    }
+
+    private void updateLastAttendanceCard() {
+        com.kal.classattendance.data.AttendanceDao attendanceDao =
+                new com.kal.classattendance.data.AttendanceDao(this);
+        com.kal.classattendance.data.AttendanceDao.SessionSummary last =
+                attendanceDao.getLatestSessionForTeacher(teacherId);
+
+        TextView tvClass = findViewById(R.id.tvLastClass);
+        TextView tvSummary = findViewById(R.id.tvLastSummary);
+
+        if (last != null) {
+            tvClass.setText(last.getClassLabel());
+            tvSummary.setText(last.getSessionDate() + " · Present " + last.getPresentCount()
+                    + " · Absent " + last.getAbsentCount() + " · Late " + last.getLateCount());
+
+            findViewById(R.id.cardLastAttendance).setOnClickListener(v -> {
+                Intent intent = new Intent(DashboardActivity.this, TakeAttendanceActivity.class);
+                intent.putExtra(ClassListActivity.EXTRA_CLASS_ID, last.getClassId());
+                intent.putExtra(ClassListActivity.EXTRA_CLASS_NAME, last.getClassLabel());
+                intent.putExtra(TakeAttendanceActivity.EXTRA_SESSION_DATE, last.getSessionDate());
+                intent.putExtra(LoginActivity.EXTRA_TEACHER_ID, teacherId);
+                startActivity(intent);
+            });
+        } else {
+            tvClass.setText(R.string.take_attendance_hint);
+            tvSummary.setText("No sessions taken yet. Tap 'Take Attendance' to start.");
+            findViewById(R.id.cardLastAttendance).setOnClickListener(null);
+        }
     }
 }
