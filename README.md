@@ -33,6 +33,23 @@ Built as a **Mobile Programming Project** using Native Android (Java), SQLite da
 
 ---
 
+## Screen Flow & Activity Diagram
+
+The diagram below maps the application architecture, navigational transitions (`Intent`), and screen flow across activities:
+
+![Class Attendance Screen Flow](docs/images/screen_flow.png)
+
+### Navigation Overview
+1. **Entry**: `SplashActivity` auto-advances after 2 seconds to `LoginActivity`.
+2. **Authentication**: Teachers can log in or transition to `RegisterActivity` to create an account, which routes directly to the main dashboard.
+3. **Core Dashboard (Home)**: Acts as the central hub connecting to:
+   - **Classes (`ClassListActivity`)**: View enrolled classes, tap `+` to open `AddClassActivity`, or tap edit/delete on cards.
+   - **Students (`ManageStudentsActivity`)**: Filter by class, search by name or ID, launch `AddStudentActivity`, and manage roster.
+   - **Attendance (`TakeAttendanceActivity`)**: Select calendar date, toggle Present/Absent/Late marks, bulk mark, or inspect individual student stats.
+   - **Reports (`ReportsActivity`)**: View attendance KPIs, visual trend line charts, and export PDF documents.
+
+---
+
 ## Android Menu & Dialog Architecture
 
 This project strictly adheres to course requirements by implementing all four standard Android menu and dialog mechanisms:
