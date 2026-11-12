@@ -82,7 +82,7 @@ This project strictly adheres to course requirements by implementing all four st
 ### Option 1: Direct APK Installation
 Download the pre-compiled APK from the [Releases](https://github.com/kalcoder101/classroom-attendance-management/releases) section or install directly via ADB:
 ```bash
-adb install -r ClassAttendance-v1.0.0.apk
+adb install -r ClassAttendance-v1.1.0.apk
 ```
 
 ### Option 2: Build from Source

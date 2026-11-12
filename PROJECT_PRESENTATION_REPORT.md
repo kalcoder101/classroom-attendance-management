@@ -3,7 +3,7 @@
 
 **Course**: Mobile App Development  
 **Core Technologies**: Android Native (**Java**), Declarative **XML**, and **SQLite Database**  
-**Version**: `v1.0.0` | **Repository**: [kalcoder101/classroom-attendance-management](https://github.com/kalcoder101/classroom-attendance-management)
+**Version**: `v1.1.0` | **Repository**: [kalcoder101/classroom-attendance-management](https://github.com/kalcoder101/classroom-attendance-management)
 
 ---
 
