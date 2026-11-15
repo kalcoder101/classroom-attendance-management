@@ -138,7 +138,8 @@ public class AttendanceChartView extends View {
         if (sessions.isEmpty()) {
             textPaint.setTextAlign(Paint.Align.CENTER);
             textPaint.setTextSize(spToPx(14));
-            canvas.drawText("No session data to plot yet", width / 2f, height / 2f, textPaint);
+            canvas.drawText(getContext().getString(R.string.chart_no_data),
+                    width / 2f, height / 2f, textPaint);
             textPaint.setTextSize(spToPx(11));
             return;
         }

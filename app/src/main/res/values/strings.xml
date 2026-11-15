@@ -193,4 +193,116 @@
     <string name="rep_summary_6">Present 6 · Absent 0 · Late 1</string>
     <string name="rep_summary_7">Present 6 · Absent 1 · Late 0</string>
 
+    <!--Login validation & errors-->
+    <string name="error_enter_username">Enter your username</string>
+    <string name="error_enter_password">Enter your password</string>
+    <string name="invalid_credentials">Invalid username or password</string>
+
+    <!--Registration validation & errors-->
+    <string name="error_full_name_required">Full name is required</string>
+    <string name="error_username_required">Username is required</string>
+    <string name="error_username_no_spaces">Username cannot contain spaces</string>
+    <string name="error_username_taken">Username already taken</string>
+    <string name="error_password_length">Password needs at least 6 characters</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+    <string name="register_failed">Could not save account, try again</string>
+    <string name="account_created">Account created, please log in</string>
+
+    <!--Take attendance-->
+    <string name="marked_all_present">Marked all as Present</string>
+    <string name="marked_all_absent">Marked all as Absent</string>
+    <string name="student_info">Student Info</string>
+    <string name="student_info_format">Name: %1$s\nID: %2$s\nClass: %3$s\nCurrent Mark: %4$s</string>
+    <string name="status_present">Present</string>
+    <string name="status_absent">Absent</string>
+    <string name="status_late">Late</string>
+    <string name="chip_present_count">Present %1$d</string>
+    <string name="chip_absent_count">Absent %1$d</string>
+    <string name="chip_late_count">Late %1$d</string>
+    <string name="unsaved_marks_title">Unsaved marks</string>
+    <string name="unsaved_marks_leave">The marks on this screen have not been saved. Leaving now will discard them.</string>
+    <string name="unsaved_marks_switch">Marks for %1$s have not been saved. Switching to %2$s will discard them.</string>
+    <string name="action_discard">Discard</string>
+    <string name="keep_marking">Keep marking</string>
+    <string name="save_failed_attendance">Could not save attendance, try again</string>
+    <plurals name="attendance_saved_students">
+        <item quantity="one">Attendance saved for %d student</item>
+        <item quantity="other">Attendance saved for %d students</item>
+    </plurals>
+
+    <!--Class list & edit-->
+    <string name="error_department_required">Department is required</string>
+    <string name="error_class_duplicate">You already have this class</string>
+    <string name="class_updated">Class updated successfully</string>
+    <string name="class_update_failed">Failed to update class</string>
+    <string name="delete_class_title">Delete Class</string>
+    <string name="delete_class_message">Are you sure you want to delete \"%1$s\"?\n\nThis will permanently remove all enrolled students and all attendance history recorded for this class.</string>
+    <string name="delete_class_positive">Delete Class</string>
+    <string name="class_deleted">Class deleted</string>
+    <string name="class_delete_failed">Could not delete class</string>
+    <string name="class_create_failed">Could not save class, try again</string>
+    <string name="class_created">%1$s created</string>
+    <plurals name="class_student_count">
+        <item quantity="one">%d student</item>
+        <item quantity="other">%d students</item>
+    </plurals>
+
+    <!--Add student-->
+    <string name="create_class_first">Create a class first</string>
+    <string name="error_student_id_required">Student ID is required</string>
+    <string name="error_student_name_required">Full name is required</string>
+    <string name="error_student_code_exists">This ID already exists in %1$s</string>
+    <string name="student_save_failed">Could not save student, try again</string>
+    <string name="student_added_to">%1$s added to %2$s</string>
+    <string name="student_added">%1$s added</string>
+
+    <!--Manage students-->
+    <string name="delete_student_title">Delete student</string>
+    <string name="delete_student_message">Remove %1$s (%2$s)?</string>
+    <string name="action_delete">Delete</string>
+    <string name="student_deleted">Student deleted</string>
+    <string name="select_valid_class">Please select a valid class</string>
+    <string name="error_student_id_taken">Another student in this class already has this ID</string>
+    <string name="move_student_title">Move student</string>
+    <string name="move_student_message">Move %1$s to %2$s?\n\nMarks from today onward are copied to the new class. Earlier attendance stays with %3$s.</string>
+    <string name="move_student_positive">Move student</string>
+    <string name="student_update_failed">Failed to update student</string>
+    <string name="student_updated">Student updated successfully</string>
+    <string name="student_moved">Student moved to the new class</string>
+    <string name="fallback_old_class">the old class</string>
+    <string name="fallback_new_class">the new class</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Close</string>
+    <plurals name="showing_students_count">
+        <item quantity="one">Showing %d student</item>
+        <item quantity="other">Showing %d students</item>
+    </plurals>
+    <plurals name="student_moved_copied">
+        <item quantity="one">Student moved, %d mark copied to the new class</item>
+        <item quantity="other">Student moved, %d marks copied to the new class</item>
+    </plurals>
+
+    <!--Dashboard counters & fallbacks-->
+    <string name="teacher_fallback">Teacher</string>
+    <string name="no_sessions_yet_hint">No sessions taken yet. Tap to start taking attendance.</string>
+    <plurals name="dashboard_classes_count">
+        <item quantity="one">%d class</item>
+        <item quantity="other">%d classes</item>
+    </plurals>
+    <plurals name="dashboard_students_count">
+        <item quantity="one">%d student</item>
+        <item quantity="other">%d students</item>
+    </plurals>
+    <plurals name="sessions_recorded">
+        <item quantity="one">%d session recorded</item>
+        <item quantity="other">%d sessions recorded</item>
+    </plurals>
+
+    <!--Reports PDF sharing-->
+    <string name="open_report_chooser_title">Open Attendance Report</string>
+    <string name="no_pdf_viewer">No PDF viewer installed</string>
+
+    <!--Chart-->
+    <string name="chart_no_data">No session data to plot yet</string>
+
 </resources>

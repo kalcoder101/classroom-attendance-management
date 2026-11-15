@@ -20,6 +20,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.kal.classattendance.data.TeacherDao;
+import com.kal.classattendance.model.Teacher;
+import com.kal.classattendance.util.SessionStore;
+
 public class SplashActivity extends AppCompatActivity {
 
     private static final long SPLASH_DELAY_MS = 2000L;
@@ -31,10 +35,26 @@ public class SplashActivity extends AppCompatActivity {
 
     // Delayed jump to Login; cancel it so backing out of the splash is final
     private final Runnable openLogin = () -> {
-        // Cross-fade: LoginActivity fades in while the splash fades out
+        // A remembered teacher whose account still exists skips the login form
+        SessionStore session = new SessionStore(SplashActivity.this);
+        long teacherId = session.getTeacherId();
+        Teacher remembered = teacherId != -1 ? new TeacherDao(this).getById(teacherId) : null;
+        if (remembered == null && teacherId != -1) {
+            session.clear(); // stale session (e.g. cleared app data elsewhere)
+        }
+
+        Intent next = remembered != null
+                ? new Intent(SplashActivity.this, DashboardActivity.class)
+                : new Intent(SplashActivity.this, LoginActivity.class);
+        if (remembered != null) {
+            next.putExtra(LoginActivity.EXTRA_TEACHER_ID, remembered.getId());
+            next.putExtra(LoginActivity.EXTRA_TEACHER_NAME, remembered.getFullName());
+        }
+
+        // Cross-fade: the next screen fades in while the splash fades out
         ActivityOptions options = ActivityOptions.makeCustomAnimation(
                 SplashActivity.this, R.anim.fade_in, R.anim.fade_out);
-        startActivity(new Intent(SplashActivity.this, LoginActivity.class), options.toBundle());
+        startActivity(next, options.toBundle());
         finish();
     };
 

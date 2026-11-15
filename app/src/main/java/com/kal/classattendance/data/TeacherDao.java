@@ -62,10 +62,30 @@ public class TeacherDao {
             if (!PasswordUtil.matches(password, salt, storedHash)) {
                 return null;                                   // wrong password
             }
+
+            long teacherId = c.getLong(c.getColumnIndexOrThrow(COL_ID));
+
+            // Transparent upgrade: legacy hashes (SHA-1, 50k iterations) and
+            // any older parameter set are rehashed with the current standard
+            // the first time the correct password comes through.
+            if (PasswordUtil.needsRehash(storedHash)) {
+                rehash(teacherId, password);
+            }
+
             return new Teacher(
-                    c.getLong(c.getColumnIndexOrThrow(COL_ID)),
+                    teacherId,
                     c.getString(c.getColumnIndexOrThrow(COL_FULL_NAME)));
         }
+    }
+
+    /** Re-salts and re-hashes the password with the current parameters. */
+    private void rehash(long teacherId, String password) {
+        String newSalt = PasswordUtil.newSalt();
+        ContentValues values = new ContentValues();
+        values.put(COL_PASSWORD_HASH, PasswordUtil.hash(password, newSalt));
+        values.put(COL_SALT, newSalt);
+        helper.getWritableDatabase().update(TABLE_TEACHERS, values,
+                COL_ID + " = ?", new String[]{String.valueOf(teacherId)});
     }
 
     // Finds a teacher by id (used later to show the name after login)

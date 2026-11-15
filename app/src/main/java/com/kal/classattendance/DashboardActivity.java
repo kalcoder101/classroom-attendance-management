@@ -175,22 +175,26 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         tvGreetingSalutation.setText(salutation);
-        tvTeacherName.setText(teacherName != null && !teacherName.isEmpty() ? teacherName : "Teacher");
+        tvTeacherName.setText(teacherName != null && !teacherName.isEmpty()
+                ? teacherName : getString(R.string.teacher_fallback));
     }
 
     private void refreshDashboardData() {
         // Dynamic Class count
         int classCount = classDao.listForTeacher(teacherId).size();
-        tvManageClassesCount.setText(classCount + (classCount == 1 ? " class" : " classes"));
+        tvManageClassesCount.setText(getResources().getQuantityString(
+                R.plurals.dashboard_classes_count, classCount, classCount));
 
         // Dynamic Student count across all classes
         int studentCount = studentDao.countForTeacher(teacherId);
-        tvManageStudentsCount.setText(studentCount + (studentCount == 1 ? " student" : " students"));
+        tvManageStudentsCount.setText(getResources().getQuantityString(
+                R.plurals.dashboard_students_count, studentCount, studentCount));
 
         // Dynamic Sessions count for Reports hint
         AttendanceOverviewStats stats = attendanceDao.getOverviewStats(teacherId, -1);
         if (stats.totalSessions > 0) {
-            tvReportsHint.setText(stats.totalSessions + (stats.totalSessions == 1 ? " session" : " sessions") + " recorded");
+            tvReportsHint.setText(getResources().getQuantityString(
+                    R.plurals.sessions_recorded, stats.totalSessions, stats.totalSessions));
         } else {
             tvReportsHint.setText(R.string.reports_hint);
         }
@@ -241,7 +245,7 @@ public class DashboardActivity extends AppCompatActivity {
         } else {
             tvLastClass.setText(R.string.take_attendance);
             tvLastRate.setVisibility(View.GONE);
-            tvLastDate.setText("No sessions taken yet. Tap to start taking attendance.");
+            tvLastDate.setText(R.string.no_sessions_yet_hint);
             tvLastChipPresent.setVisibility(View.GONE);
             tvLastChipAbsent.setVisibility(View.GONE);
             tvLastChipLate.setVisibility(View.GONE);

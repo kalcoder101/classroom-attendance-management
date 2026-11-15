@@ -1,5 +1,6 @@
 package com.kal.classattendance;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -284,13 +285,20 @@ public class ReportsActivity extends AppCompatActivity {
         shareIntent.setType("application/pdf");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // Some receiving apps only see the URI grant when it is also carried
+        // by ClipData, especially through EXTRA_INITIAL_INTENTS in a chooser
+        ClipData grant = ClipData.newUri(getContentResolver(), "Attendance report", uri);
+        shareIntent.setClipData(grant);
 
-        Intent chooser = Intent.createChooser(viewIntent, "Open Attendance Report");
+        Intent chooser = Intent.createChooser(viewIntent,
+                getString(R.string.open_report_chooser_title));
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{shareIntent});
+        chooser.setClipData(grant);
+        chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {
             startActivity(chooser);
         } catch (Exception e) {
-            Toast.makeText(this, "No PDF viewer installed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_pdf_viewer, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -75,7 +75,7 @@ public class AddStudentActivity extends AppCompatActivity {
 
         // "All classes" would leave the target class ambiguous, so guard against it
         if (classes.isEmpty()) {
-            Toast.makeText(this, "Create a class first", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.create_class_first, Toast.LENGTH_LONG).show();
             btnSave.setEnabled(false);
             btnDone.setEnabled(false);
         }
@@ -90,7 +90,7 @@ public class AddStudentActivity extends AppCompatActivity {
     private void saveStudent(boolean addAnother) {
         int position = spClass.getSelectedItemPosition();
         if (position == AdapterView.INVALID_POSITION || position >= classes.size()) {
-            Toast.makeText(this, "Create a class first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.create_class_first, Toast.LENGTH_SHORT).show();
             return;
         }
         SchoolClass selectedClass = classes.get(position);
@@ -100,14 +100,14 @@ public class AddStudentActivity extends AppCompatActivity {
 
         boolean valid = true;
         if (studentCode.isEmpty()) {
-            etStudentId.setError("Student ID is required");
+            etStudentId.setError(getString(R.string.error_student_id_required));
             valid = false;
         } else if (studentDao.exists(selectedClass.getId(), studentCode)) {
-            etStudentId.setError("This ID already exists in " + selectedClass.getLabel());
+            etStudentId.setError(getString(R.string.error_student_code_exists, selectedClass.getLabel()));
             valid = false;
         }
         if (fullName.isEmpty()) {
-            etStudentName.setError("Full name is required");
+            etStudentName.setError(getString(R.string.error_student_name_required));
             valid = false;
         }
         if (!valid) {
@@ -116,18 +116,19 @@ public class AddStudentActivity extends AppCompatActivity {
 
         long id = studentDao.insert(selectedClass.getId(), studentCode, fullName);
         if (id == -1) {
-            Toast.makeText(this, "Could not save student, try again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.student_save_failed, Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (addAnother) {
-            Toast.makeText(this, fullName + " added to " + selectedClass.getLabel(),
+            Toast.makeText(this,
+                    getString(R.string.student_added_to, fullName, selectedClass.getLabel()),
                     Toast.LENGTH_SHORT).show();
             etStudentId.setText("");
             etStudentName.setText("");
             etStudentId.requestFocus();
         } else {
-            Toast.makeText(this, fullName + " added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.student_added, fullName), Toast.LENGTH_SHORT).show();
             finish(); // back to Manage Students, which reloads in onResume
         }
     }

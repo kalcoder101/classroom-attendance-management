@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.kal.classattendance.data.TeacherDao;
 import com.kal.classattendance.model.Teacher;
+import com.kal.classattendance.util.AppExecutors;
+import com.kal.classattendance.util.SessionStore;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -65,32 +68,45 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
         // Login checks the credentials against the teachers table
-        findViewById(R.id.btnLogin).setOnClickListener(v -> {
+        View btnLogin = findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(v -> {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
 
             if (username.isEmpty()) {
-                etUsername.setError("Enter your username");
+                etUsername.setError(getString(R.string.error_enter_username));
                 etUsername.requestFocus();
                 return;
             }
             if (password.isEmpty()) {
-                etPassword.setError("Enter your password");
+                etPassword.setError(getString(R.string.error_enter_password));
                 etPassword.requestFocus();
                 return;
             }
 
-            Teacher teacher = teacherDao.login(username, password);
-            if (teacher == null) {
-                Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // PBKDF2 verification is deliberately slow, so it runs off the
+            // UI thread and the button is locked while it does
+            btnLogin.setEnabled(false);
+            AppExecutors.runOnDb(() -> {
+                Teacher teacher = teacherDao.login(username, password);
+                AppExecutors.runOnMain(() -> {
+                    btnLogin.setEnabled(true);
+                    if (teacher == null) {
+                        Toast.makeText(this, R.string.invalid_credentials,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-            intent.putExtra(EXTRA_TEACHER_ID, teacher.getId());
-            intent.putExtra(EXTRA_TEACHER_NAME, teacher.getFullName());
-            startActivity(intent);
-            finish(); // back from the dashboard should not return to the login form
+                    // Remember the login so the next launch skips this screen
+                    new SessionStore(this).save(teacher.getId());
+
+                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    intent.putExtra(EXTRA_TEACHER_ID, teacher.getId());
+                    intent.putExtra(EXTRA_TEACHER_NAME, teacher.getFullName());
+                    startActivity(intent);
+                    finish(); // back from the dashboard should not return to the login form
+                });
+            });
         });
     }
 }

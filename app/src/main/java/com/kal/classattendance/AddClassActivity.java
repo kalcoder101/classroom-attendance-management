@@ -66,7 +66,7 @@ public class AddClassActivity extends AppCompatActivity {
                 int section = spSection.getSelectedItemPosition() + 1;
 
                 if (classDao.exists(teacherId, department, year, section)) {
-                    etDepartment.setError("You already have this class");
+                    etDepartment.setError(getString(R.string.error_class_duplicate));
                     etDepartment.requestFocus();
                     return;
                 }
@@ -74,12 +74,13 @@ public class AddClassActivity extends AppCompatActivity {
                 long id = classDao.insert(teacherId, department, year, section);
                 if (id == -1) {
                     Toast.makeText(AddClassActivity.this,
-                            "Could not save class, try again", Toast.LENGTH_SHORT).show();
+                            R.string.class_create_failed, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 String classSummary = department + " · " + spYear.getSelectedItem() + " · " + spSection.getSelectedItem();
-                Toast.makeText(AddClassActivity.this, classSummary + " created", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddClassActivity.this,
+                        getString(R.string.class_created, classSummary), Toast.LENGTH_SHORT).show();
                 finish(); // back to ClassListActivity, which reloads the list in onResume
             }
         });

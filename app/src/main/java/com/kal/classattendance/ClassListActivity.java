@@ -93,7 +93,8 @@ public class ClassListActivity extends AppCompatActivity {
             ImageView btnDelete = card.findViewById(R.id.btnDeleteClass);
 
             tvName.setText(schoolClass.getLabel());
-            tvCount.setText(schoolClass.getStudentCount() + (schoolClass.getStudentCount() == 1 ? " student" : " students"));
+            tvCount.setText(getResources().getQuantityString(R.plurals.class_student_count,
+                    schoolClass.getStudentCount(), schoolClass.getStudentCount()));
 
             // In attendance mode, hide edit/delete buttons to keep UI focused on picking a class
             if (attendanceMode) {
@@ -149,7 +150,7 @@ public class ClassListActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.btnSaveEditClass).setOnClickListener(v -> {
             String department = etDepartment.getText().toString().trim().toUpperCase();
             if (department.isEmpty()) {
-                etDepartment.setError("Department is required");
+                etDepartment.setError(getString(R.string.error_department_required));
                 return;
             }
 
@@ -157,17 +158,17 @@ public class ClassListActivity extends AppCompatActivity {
             int section = spSection.getSelectedItemPosition() + 1;
 
             if (classDao.existsExcept(teacherId, department, year, section, schoolClass.getId())) {
-                etDepartment.setError("You already have this class");
+                etDepartment.setError(getString(R.string.error_class_duplicate));
                 return;
             }
 
             boolean updated = classDao.update(schoolClass.getId(), department, year, section);
             if (updated) {
-                Toast.makeText(this, "Class updated successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.class_updated, Toast.LENGTH_SHORT).show();
                 loadClasses();
                 dialog.dismiss();
             } else {
-                Toast.makeText(this, "Failed to update class", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.class_update_failed, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -176,19 +177,18 @@ public class ClassListActivity extends AppCompatActivity {
 
     private void showDeleteClassConfirmation(SchoolClass schoolClass) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Class")
-                .setMessage("Are you sure you want to delete \"" + schoolClass.getLabel() + "\"?\n\n"
-                        + "This will permanently remove all enrolled students and all attendance history recorded for this class.")
-                .setPositiveButton("Delete Class", (d, which) -> {
+                .setTitle(R.string.delete_class_title)
+                .setMessage(getString(R.string.delete_class_message, schoolClass.getLabel()))
+                .setPositiveButton(R.string.delete_class_positive, (d, which) -> {
                     boolean deleted = classDao.delete(schoolClass.getId());
                     if (deleted) {
-                        Toast.makeText(this, "Class deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.class_deleted, Toast.LENGTH_SHORT).show();
                         loadClasses();
                     } else {
-                        Toast.makeText(this, "Could not delete class", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.class_delete_failed, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.btn_cancel, null)
                 .show();
     }
 }

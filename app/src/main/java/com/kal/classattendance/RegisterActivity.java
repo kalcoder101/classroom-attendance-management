@@ -3,6 +3,7 @@ package com.kal.classattendance;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.kal.classattendance.data.TeacherDao;
+import com.kal.classattendance.util.AppExecutors;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -72,7 +74,8 @@ public class RegisterActivity extends AppCompatActivity {
         findViewById(R.id.tvLoginLink).setOnClickListener(v -> finish());
 
         // Register validates the form and saves the new teacher
-        findViewById(R.id.btnRegister).setOnClickListener(v -> {
+        View btnRegister = findViewById(R.id.btnRegister);
+        btnRegister.setOnClickListener(v -> {
             String fullName = etFullName.getText().toString().trim();
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
@@ -81,39 +84,53 @@ public class RegisterActivity extends AppCompatActivity {
             boolean valid = true;
 
             if (fullName.isEmpty()) {
-                etFullName.setError("Full name is required");
+                etFullName.setError(getString(R.string.error_full_name_required));
                 valid = false;
             }
             if (username.isEmpty()) {
-                etUsername.setError("Username is required");
+                etUsername.setError(getString(R.string.error_username_required));
                 valid = false;
             } else if (username.contains(" ")) {
-                etUsername.setError("Username cannot contain spaces");
-                valid = false;
-            } else if (teacherDao.usernameExists(username)) {
-                etUsername.setError("Username already taken");
+                etUsername.setError(getString(R.string.error_username_no_spaces));
                 valid = false;
             }
             if (password.length() < 6) {
-                etPassword.setError("Password needs at least 6 characters");
+                etPassword.setError(getString(R.string.error_password_length));
                 valid = false;
             }
             if (!confirmPassword.equals(password)) {
-                etConfirmPassword.setError("Passwords do not match");
+                etConfirmPassword.setError(getString(R.string.error_passwords_mismatch));
                 valid = false;
             }
             if (!valid) {
                 return;
             }
 
-            long id = teacherDao.register(fullName, username, password);
-            if (id == -1) {
-                Toast.makeText(this, "Could not save account, try again", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Toast.makeText(this, "Account created, please log in", Toast.LENGTH_LONG).show();
-            finish(); // back to LoginActivity
+            // Salting and PBKDF2 hashing run off the UI thread; the username
+            // check is repeated here, right before the insert, so the check
+            // and the write happen on the same worker (the UNIQUE constraint
+            // on the column is the final safety net)
+            btnRegister.setEnabled(false);
+            AppExecutors.runOnDb(() -> {
+                if (teacherDao.usernameExists(username)) {
+                    AppExecutors.runOnMain(() -> {
+                        btnRegister.setEnabled(true);
+                        etUsername.setError(getString(R.string.error_username_taken));
+                    });
+                    return;
+                }
+                long id = teacherDao.register(fullName, username, password);
+                AppExecutors.runOnMain(() -> {
+                    btnRegister.setEnabled(true);
+                    if (id == -1) {
+                        Toast.makeText(this, R.string.register_failed,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(this, R.string.account_created, Toast.LENGTH_LONG).show();
+                    finish(); // back to LoginActivity
+                });
+            });
         });
     }
 }

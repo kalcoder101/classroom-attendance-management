@@ -213,8 +213,8 @@ public class ManageStudentsActivity extends AppCompatActivity {
             shown++;
         }
 
-        String label = "Showing " + shown
-                + (shown == 1 ? " student" : " students");
+        String label = getResources().getQuantityString(R.plurals.showing_students_count,
+                shown, shown);
         tvShowing.setText(label);
         emptyView.setVisibility(shown == 0 ? View.VISIBLE : View.GONE);
     }
@@ -242,16 +242,16 @@ public class ManageStudentsActivity extends AppCompatActivity {
 
     private void confirmDeleteStudent(Student student) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete student")
-                .setMessage("Remove " + student.getFullName() + " ("
-                        + student.getStudentCode() + ")?")
-                .setPositiveButton("Delete", (d, w) -> {
+                .setTitle(R.string.delete_student_title)
+                .setMessage(getString(R.string.delete_student_message,
+                        student.getFullName(), student.getStudentCode()))
+                .setPositiveButton(R.string.action_delete, (d, w) -> {
                     studentDao.delete(student.getId());
                     allStudents = studentDao.listForTeacher(teacherId);
                     renderStudents();
-                    Toast.makeText(this, "Student deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.student_deleted, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.btn_cancel, null)
                 .show();
     }
 
@@ -371,23 +371,23 @@ public class ManageStudentsActivity extends AppCompatActivity {
             String newCode = etCode.getText().toString().trim().toUpperCase();
 
             if (newName.isEmpty()) {
-                etName.setError("Full name is required");
+                etName.setError(getString(R.string.error_student_name_required));
                 return;
             }
             if (newCode.isEmpty()) {
-                etCode.setError("Student ID is required");
+                etCode.setError(getString(R.string.error_student_id_required));
                 return;
             }
 
             int pos = spClass.getSelectedItemPosition();
             if (pos < 0 || pos >= classes.size()) {
-                Toast.makeText(this, "Please select a valid class", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_valid_class, Toast.LENGTH_SHORT).show();
                 return;
             }
             long newClassId = classes.get(pos).getId();
 
             if (studentDao.existsExcept(newClassId, newCode, student.getId())) {
-                etCode.setError("Another student in this class already has this ID");
+                etCode.setError(getString(R.string.error_student_id_taken));
                 return;
             }
 
@@ -409,17 +409,16 @@ public class ManageStudentsActivity extends AppCompatActivity {
     private void confirmMoveStudent(Student student, long newClassId, String newCode,
                                     String newName, AlertDialog dialog) {
         String oldLabel = student.getClassLabel() != null
-                ? student.getClassLabel() : "the old class";
+                ? student.getClassLabel() : getString(R.string.fallback_old_class);
         String newLabel = classLabelFor(newClassId);
 
         new AlertDialog.Builder(this)
-                .setTitle("Move student")
-                .setMessage("Move " + student.getFullName() + " to " + newLabel + "?\n\n"
-                        + "Marks from today onward are copied to the new class. "
-                        + "Earlier attendance stays with " + oldLabel + ".")
-                .setPositiveButton("Move student", (d, w) ->
+                .setTitle(R.string.move_student_title)
+                .setMessage(getString(R.string.move_student_message,
+                        student.getFullName(), newLabel, oldLabel))
+                .setPositiveButton(R.string.move_student_positive, (d, w) ->
                         applyStudentEdit(student, newClassId, newCode, newName, dialog))
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.btn_cancel, null)
                 .show();
     }
 
@@ -429,19 +428,18 @@ public class ManageStudentsActivity extends AppCompatActivity {
         long oldClassId = student.getClassId();
         boolean updated = studentDao.update(student.getId(), newClassId, newCode, newName);
         if (!updated) {
-            Toast.makeText(this, "Failed to update student", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.student_update_failed, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String message = "Student updated successfully";
+        String message = getString(R.string.student_updated);
         if (newClassId != oldClassId) {
             String today = DB_DATE.format(new Date());
             int copied = attendanceDao.copyRecordsFromDate(
                     student.getId(), oldClassId, newClassId, today);
             message = copied > 0
-                    ? "Student moved, " + copied + (copied == 1 ? " mark" : " marks")
-                            + " copied to the new class"
-                    : "Student moved to the new class";
+                    ? getResources().getQuantityString(R.plurals.student_moved_copied, copied, copied)
+                    : getString(R.string.student_moved);
         }
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
@@ -456,6 +454,6 @@ public class ManageStudentsActivity extends AppCompatActivity {
                 return c.getLabel();
             }
         }
-        return "the new class";
+        return getString(R.string.fallback_new_class);
     }
 }

@@ -296,7 +296,11 @@ public class AttendanceDao {
         }
 
         sql.append("GROUP BY s.").append(COL_ID).append(" ")
-           .append("ORDER BY s.").append(COL_SESSION_DATE).append(" DESC, s.").append(COL_ID).append(" DESC");
+            // Sessions with no records (every student was deleted, or the app
+            // crashed right after session creation) are meaningless zeros, so
+            // they are not shown or counted anywhere.
+            .append("HAVING COUNT(r.").append(COL_ID).append(") > 0 ")
+            .append("ORDER BY s.").append(COL_SESSION_DATE).append(" DESC, s.").append(COL_ID).append(" DESC");
         if (limit > 0) {
             sql.append(" LIMIT ").append(limit);
         }
@@ -335,7 +339,10 @@ public class AttendanceDao {
            .append("FROM ").append(TABLE_SESSIONS).append(" s ")
            .append("JOIN ").append(TABLE_CLASSES).append(" c ON c.").append(COL_ID).append(" = s.").append(COL_CLASS_ID).append(" ")
            .append("LEFT JOIN ").append(TABLE_RECORDS).append(" r ON r.").append(COL_SESSION_ID).append(" = s.").append(COL_ID).append(" ")
-           .append("WHERE c.").append(COL_TEACHER_ID).append(" = ? ");
+           // Sessions left with no records (all students deleted) are skipped,
+           // matching the HAVING filter in the session summaries.
+           .append("WHERE c.").append(COL_TEACHER_ID).append(" = ? ")
+           .append("AND r.").append(COL_ID).append(" IS NOT NULL ");
 
         java.util.List<String> args = new java.util.ArrayList<>();
         args.add(String.valueOf(teacherId));

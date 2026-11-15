@@ -143,11 +143,11 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.menu_mark_all_present) {
                 markAllPresent();
-                Toast.makeText(this, "Marked all as Present", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.marked_all_present, Toast.LENGTH_SHORT).show();
                 return true;
             } else if (id == R.id.menu_mark_all_absent) {
                 markAllStatus(AttendanceDao.STATUS_ABSENT);
-                Toast.makeText(this, "Marked all as Absent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.marked_all_absent, Toast.LENGTH_SHORT).show();
                 return true;
             } else if (id == R.id.menu_sort_name) {
                 item.setChecked(true);
@@ -285,10 +285,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             // Switching days starts from that day's saved marks, so any unsaved
             // marks on the current date would be lost
             confirmDiscardThen(
-                    "Marks for " + DISPLAY_DATE.format(sessionDate.getTime())
-                            + " have not been saved. Switching to "
-                            + DISPLAY_DATE.format(newDate.getTime())
-                            + " will discard them.",
+                    getString(R.string.unsaved_marks_switch,
+                            DISPLAY_DATE.format(sessionDate.getTime()),
+                            DISPLAY_DATE.format(newDate.getTime())),
                     () -> {
                         sessionDate.setTimeInMillis(newDate.getTimeInMillis());
                         refreshDateLabel();
@@ -368,8 +367,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
     /** Runs the action immediately, or asks first when marks are unsaved. */
     private void confirmDiscardThen(Runnable action) {
-        confirmDiscardThen("The marks on this screen have not been saved. "
-                + "Leaving now will discard them.", action);
+        confirmDiscardThen(getString(R.string.unsaved_marks_leave), action);
     }
 
     /** Runs the action immediately, or asks first with the given message. */
@@ -379,10 +377,10 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Unsaved marks")
+                .setTitle(R.string.unsaved_marks_title)
                 .setMessage(message)
-                .setPositiveButton("Discard", (dialog, which) -> action.run())
-                .setNegativeButton("Keep marking", null)
+                .setPositiveButton(R.string.action_discard, (dialog, which) -> action.run())
+                .setNegativeButton(R.string.keep_marking, null)
                 .show();
     }
 
@@ -474,12 +472,11 @@ public class TakeAttendanceActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.action_student_details) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Student Info")
-                        .setMessage("Name: " + student.getFullName() + "\n"
-                                + "ID: " + student.getStudentCode() + "\n"
-                                + "Class: " + classLabel + "\n"
-                                + "Current Mark: " + statusLabel(statuses.get(student.getId())))
-                        .setPositiveButton("OK", null)
+                        .setTitle(R.string.student_info)
+                        .setMessage(getString(R.string.student_info_format,
+                                student.getFullName(), student.getStudentCode(), classLabel,
+                                statusLabel(statuses.get(student.getId()))))
+                        .setPositiveButton(R.string.action_ok, null)
                         .show();
                 return true;
             }
@@ -489,14 +486,14 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     }
 
     /** "P" / "A" / "L" as the words teachers see in the summary chips. */
-    private static String statusLabel(String status) {
+    private String statusLabel(String status) {
         if (AttendanceDao.STATUS_ABSENT.equals(status)) {
-            return "Absent";
+            return getString(R.string.status_absent);
         }
         if (AttendanceDao.STATUS_LATE.equals(status)) {
-            return "Late";
+            return getString(R.string.status_late);
         }
-        return "Present";
+        return getString(R.string.status_present);
     }
 
     /** Sets every student to a specified status and refreshes the rows + chips. */
@@ -547,9 +544,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
     /** Present / Absent / Late counters under the class name. */
     private void updateChips() {
         int[] counts = statusCounts();
-        chipPresent.setText("Present " + counts[0]);
-        chipAbsent.setText("Absent " + counts[1]);
-        chipLate.setText("Late " + counts[2]);
+        chipPresent.setText(getString(R.string.chip_present_count, counts[0]));
+        chipAbsent.setText(getString(R.string.chip_absent_count, counts[1]));
+        chipLate.setText(getString(R.string.chip_late_count, counts[2]));
     }
 
     /** Saves the session and every mark, then returns to the previous screen. */
@@ -580,13 +577,13 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             // Tell screens that may be open behind this one that data changed
             sendBroadcast(new Intent(ACTION_ATTENDANCE_SAVED).setPackage(getPackageName()));
 
-            Toast.makeText(this, "Attendance saved for "
-                    + students.size() + (students.size() == 1 ? " student" : " students"),
+            Toast.makeText(this,
+                    getResources().getQuantityString(R.plurals.attendance_saved_students,
+                            students.size(), students.size()),
                     Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(this, "Could not save attendance, try again",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.save_failed_attendance, Toast.LENGTH_SHORT).show();
         }
     }
 }
