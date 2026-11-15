@@ -76,6 +76,16 @@ public class ClassDao {
                 new String[]{String.valueOf(classId)}) > 0;
     }
 
+    // Total classes of this teacher (used for dashboard-style counters)
+    public int countForTeacher(long teacherId) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + TABLE_CLASSES
+                + " WHERE " + COL_TEACHER_ID + " = ?";
+        try (Cursor c = db.rawQuery(sql, new String[]{String.valueOf(teacherId)})) {
+            return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
     // All classes of this teacher, each with its student count, in stable order
     public List<SchoolClass> listForTeacher(long teacherId) {
         SQLiteDatabase db = helper.getReadableDatabase();

@@ -29,18 +29,14 @@ import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.model.SchoolClass;
 import com.kal.classattendance.model.Student;
+import com.kal.classattendance.util.Dates;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class ManageStudentsActivity extends AppCompatActivity {
-
-    // yyyy-MM-dd is how dates are stored in the database
-    private static final SimpleDateFormat DB_DATE =
-            new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private StudentDao studentDao;
     private AttendanceDao attendanceDao;
@@ -193,7 +189,9 @@ public class ManageStudentsActivity extends AppCompatActivity {
     }
 
     private void renderStudents() {
-        String query = etSearch.getText().toString().trim().toLowerCase();
+        // Locale.ROOT keeps search predictable everywhere: the default locale
+        // would remap i/I in Turkish locales and break matches
+        String query = etSearch.getText().toString().trim().toLowerCase(Locale.ROOT);
         long classId = selectedClassId();
 
         listStudents.removeAllViews();
@@ -204,8 +202,8 @@ public class ManageStudentsActivity extends AppCompatActivity {
                 continue;
             }
             boolean matches = query.isEmpty()
-                    || student.getFullName().toLowerCase().contains(query)
-                    || student.getStudentCode().toLowerCase().contains(query);
+                    || student.getFullName().toLowerCase(Locale.ROOT).contains(query)
+                    || student.getStudentCode().toLowerCase(Locale.ROOT).contains(query);
             if (!matches) {
                 continue;
             }
@@ -367,8 +365,9 @@ public class ManageStudentsActivity extends AppCompatActivity {
 
         dialogView.findViewById(R.id.btnSaveEditStudent).setOnClickListener(v -> {
             String newName = etName.getText().toString().trim();
-            // Same normalisation as Add Student so IDs stay consistent
-            String newCode = etCode.getText().toString().trim().toUpperCase();
+            // Same normalisation as Add Student so IDs stay consistent;
+            // Locale.ROOT avoids Turkish-locale i/I remapping
+            String newCode = etCode.getText().toString().trim().toUpperCase(Locale.ROOT);
 
             if (newName.isEmpty()) {
                 etName.setError(getString(R.string.error_student_name_required));
@@ -434,7 +433,7 @@ public class ManageStudentsActivity extends AppCompatActivity {
 
         String message = getString(R.string.student_updated);
         if (newClassId != oldClassId) {
-            String today = DB_DATE.format(new Date());
+            String today = Dates.dbKey(new Date());
             int copied = attendanceDao.copyRecordsFromDate(
                     student.getId(), oldClassId, newClassId, today);
             message = copied > 0

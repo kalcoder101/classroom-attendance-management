@@ -18,6 +18,8 @@ import com.google.android.material.button.MaterialButton;
 import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.LoginActivity;
 
+import java.util.Locale;
+
 public class AddClassActivity extends AppCompatActivity {
 
     private Spinner spYear;
@@ -54,8 +56,9 @@ public class AddClassActivity extends AppCompatActivity {
         btnSaveClass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Same normalisation as the class edit dialog so labels match
-                String department = etDepartment.getText().toString().trim().toUpperCase();
+                // Same normalisation as the class edit dialog so labels match;
+                // Locale.ROOT keeps them identical on every device
+                String department = etDepartment.getText().toString().trim().toUpperCase(Locale.ROOT);
                 if (department.isEmpty()) {
                     etDepartment.setError(getString(R.string.hint_department));
                     etDepartment.requestFocus();

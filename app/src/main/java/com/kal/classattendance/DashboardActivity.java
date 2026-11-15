@@ -22,6 +22,7 @@ import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.data.TeacherDao;
 import com.kal.classattendance.model.Teacher;
+import com.kal.classattendance.util.Dates;
 import com.kal.classattendance.util.Logout;
 
 import java.text.SimpleDateFormat;
@@ -181,7 +182,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void refreshDashboardData() {
         // Dynamic Class count
-        int classCount = classDao.listForTeacher(teacherId).size();
+        int classCount = classDao.countForTeacher(teacherId);
         tvManageClassesCount.setText(getResources().getQuantityString(
                 R.plurals.dashboard_classes_count, classCount, classCount));
 
@@ -214,12 +215,10 @@ public class DashboardActivity extends AppCompatActivity {
 
             // Formatted date
             String formattedDate = last.getSessionDate();
-            try {
-                SimpleDateFormat dbFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                SimpleDateFormat displayFmt = new SimpleDateFormat("d MMM yyyy", Locale.US);
-                Date d = dbFmt.parse(last.getSessionDate());
-                if (d != null) formattedDate = displayFmt.format(d);
-            } catch (Exception ignored) {}
+            Date d = Dates.parseDbKey(last.getSessionDate());
+            if (d != null) {
+                formattedDate = Dates.display(d);
+            }
 
             tvLastDate.setText(formattedDate);
 

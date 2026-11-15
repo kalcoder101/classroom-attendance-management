@@ -13,14 +13,13 @@ import androidx.core.content.ContextCompat;
 
 import com.kal.classattendance.R;
 import com.kal.classattendance.data.AttendanceDao.SessionSummary;
+import com.kal.classattendance.util.Dates;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import android.util.TypedValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Modern canvas-rendered chart view that visualizes attendance percentage trends
@@ -37,8 +36,6 @@ public class AttendanceChartView extends View {
     private final Paint barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final List<SessionSummary> sessions = new ArrayList<>();
-    private final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private final SimpleDateFormat labelFormat = new SimpleDateFormat("d MMM", Locale.US);
 
     private int primaryColor;
     private int gridColor;
@@ -200,10 +197,10 @@ public class AttendanceChartView extends View {
 
             // Date label below axis
             String dateLabel = s.getSessionDate();
-            try {
-                Date d = inFormat.parse(s.getSessionDate());
-                if (d != null) dateLabel = labelFormat.format(d);
-            } catch (ParseException ignored) {}
+            Date d = Dates.parseDbKey(s.getSessionDate());
+            if (d != null) {
+                dateLabel = Dates.chartLabel(d);
+            }
             canvas.drawText(dateLabel, x, height - dpToPx(8), textPaint);
         }
     }
@@ -213,6 +210,9 @@ public class AttendanceChartView extends View {
     }
 
     private float spToPx(float sp) {
-        return sp * getResources().getDisplayMetrics().scaledDensity;
+        // applyDimension replaces the deprecated DisplayMetrics.scaledDensity
+        // (deprecated in API 34) and stays consistent with the user's font scale
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
+                getResources().getDisplayMetrics());
     }
 }

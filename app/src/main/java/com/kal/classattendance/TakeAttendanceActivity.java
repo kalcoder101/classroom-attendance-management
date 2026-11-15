@@ -33,25 +33,18 @@ import com.kal.classattendance.data.AttendanceDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.model.Student;
 import com.kal.classattendance.util.AttendanceNotifier;
+import com.kal.classattendance.util.Dates;
 import com.kal.classattendance.util.Logout;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import android.widget.PopupMenu;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
 public class TakeAttendanceActivity extends AppCompatActivity {
-
-    // yyyy-MM-dd is how dates are stored in the database
-    private static final SimpleDateFormat DB_DATE =
-            new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private static final SimpleDateFormat DISPLAY_DATE =
-            new SimpleDateFormat("d MMM yyyy", Locale.US);
 
     private StudentDao studentDao;
     private AttendanceDao attendanceDao;
@@ -114,12 +107,10 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
         String initialDateStr = getIntent().getStringExtra(EXTRA_SESSION_DATE);
         if (initialDateStr != null && !initialDateStr.isEmpty()) {
-            try {
-                java.util.Date parsed = DB_DATE.parse(initialDateStr);
-                if (parsed != null) {
-                    sessionDate.setTime(parsed);
-                }
-            } catch (Exception ignored) {}
+            java.util.Date parsed = Dates.parseDbKey(initialDateStr);
+            if (parsed != null) {
+                sessionDate.setTime(parsed);
+            }
         }
 
         TextView tvClassName = findViewById(R.id.tvClassName);
@@ -286,8 +277,8 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             // marks on the current date would be lost
             confirmDiscardThen(
                     getString(R.string.unsaved_marks_switch,
-                            DISPLAY_DATE.format(sessionDate.getTime()),
-                            DISPLAY_DATE.format(newDate.getTime())),
+                            Dates.display(sessionDate.getTime()),
+                            Dates.display(newDate.getTime())),
                     () -> {
                         sessionDate.setTimeInMillis(newDate.getTimeInMillis());
                         refreshDateLabel();
@@ -309,9 +300,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         boolean isToday = isSameDay(Calendar.getInstance(), sessionDate);
 
         if (isToday) {
-            btnDate.setText(getString(R.string.today) + ", " + DISPLAY_DATE.format(sessionDate.getTime()));
+            btnDate.setText(getString(R.string.today) + ", " + Dates.display(sessionDate.getTime()));
         } else {
-            btnDate.setText(DISPLAY_DATE.format(sessionDate.getTime()));
+            btnDate.setText(Dates.display(sessionDate.getTime()));
         }
     }
 
@@ -329,7 +320,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         Map<Long, String> previousMarks = new HashMap<>(statuses);
         students = studentDao.listForClass(classId);
 
-        String dateKey = DB_DATE.format(sessionDate.getTime());
+        String dateKey = Dates.dbKey(sessionDate.getTime());
         savedStatuses.clear();
         long sessionId = attendanceDao.findSessionId(classId, dateKey);
         if (sessionId != -1) {
@@ -556,7 +547,7 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             return;
         }
 
-        String dateKey = DB_DATE.format(sessionDate.getTime());
+        String dateKey = Dates.dbKey(sessionDate.getTime());
         long sessionId = attendanceDao.getOrCreateSession(classId, dateKey);
         if (sessionId == -1) {
             // The session row could not be created (e.g. a race on the

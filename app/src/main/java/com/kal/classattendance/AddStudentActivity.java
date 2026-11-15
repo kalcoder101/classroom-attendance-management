@@ -20,6 +20,7 @@ import com.kal.classattendance.model.SchoolClass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AddStudentActivity extends AppCompatActivity {
 
@@ -95,7 +96,8 @@ public class AddStudentActivity extends AppCompatActivity {
         }
         SchoolClass selectedClass = classes.get(position);
 
-        String studentCode = etStudentId.getText().toString().trim().toUpperCase();
+        // Locale.ROOT keeps ID normalisation identical on every device
+        String studentCode = etStudentId.getText().toString().trim().toUpperCase(Locale.ROOT);
         String fullName = etStudentName.getText().toString().trim();
 
         boolean valid = true;

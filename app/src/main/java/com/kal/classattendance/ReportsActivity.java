@@ -25,24 +25,19 @@ import com.kal.classattendance.data.AttendanceDao.AttendanceOverviewStats;
 import com.kal.classattendance.data.AttendanceDao.SessionSummary;
 import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.model.SchoolClass;
+import com.kal.classattendance.util.Dates;
 import com.kal.classattendance.util.PdfReportExporter;
 import com.kal.classattendance.view.AttendanceChartView;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ReportsActivity extends AppCompatActivity {
 
     public static final String EXTRA_TEACHER_ID = "teacher_id";
     public static final String EXTRA_CLASS_ID = "class_id";
-
-    private static final SimpleDateFormat DB_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private static final SimpleDateFormat DISPLAY_DATE = new SimpleDateFormat("d MMM yyyy", Locale.US);
 
     private AttendanceDao attendanceDao;
     private ClassDao classDao;
@@ -198,10 +193,10 @@ public class ReportsActivity extends AppCompatActivity {
 
                 // Format display date
                 String formattedDate = session.getSessionDate();
-                try {
-                    Date d = DB_DATE.parse(session.getSessionDate());
-                    if (d != null) formattedDate = DISPLAY_DATE.format(d);
-                } catch (ParseException ignored) {}
+                Date d = Dates.parseDbKey(session.getSessionDate());
+                if (d != null) {
+                    formattedDate = Dates.display(d);
+                }
 
                 tvDate.setText(formattedDate);
                 tvClass.setText(session.getClassLabel());

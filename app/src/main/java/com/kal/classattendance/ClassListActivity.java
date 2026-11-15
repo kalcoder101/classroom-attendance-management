@@ -23,6 +23,7 @@ import com.kal.classattendance.model.SchoolClass;
 import com.kal.classattendance.util.Logout;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ClassListActivity extends AppCompatActivity {
 
@@ -148,7 +149,8 @@ public class ClassListActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.btnCancelEditClass).setOnClickListener(v -> dialog.dismiss());
 
         dialogView.findViewById(R.id.btnSaveEditClass).setOnClickListener(v -> {
-            String department = etDepartment.getText().toString().trim().toUpperCase();
+            // Locale.ROOT keeps department labels identical on every device
+            String department = etDepartment.getText().toString().trim().toUpperCase(Locale.ROOT);
             if (department.isEmpty()) {
                 etDepartment.setError(getString(R.string.error_department_required));
                 return;
