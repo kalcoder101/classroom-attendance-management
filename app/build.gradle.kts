@@ -12,8 +12,8 @@ android {
         applicationId = "com.kal.classattendance"
         minSdk = 24
         targetSdk = 37
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,6 +24,10 @@ android {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
             }
+            // No dedicated keystore for this coursework app: sign the
+            // optimized release build with the debug key so the APK
+            // installs directly when sideloaded
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
