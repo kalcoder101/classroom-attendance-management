@@ -155,7 +155,7 @@ public class PdfReportExporter {
 
                 y = sTableTop + 22;
 
-                int sessionsToShow = Math.min(sessions.size(), 4);
+                int sessionsToShow = Math.min(sessions.size(), 5);
                 paint.setTextSize(9);
 
                 if (sessions.isEmpty()) {
@@ -352,6 +352,17 @@ public class PdfReportExporter {
                 // Write file to cache
                 File reportsDir = new File(context.getCacheDir(), "reports");
                 if (!reportsDir.exists()) reportsDir.mkdirs();
+
+                // Previous exports are unreachable through the UI and are
+                // re-shared immediately after generation, so remove them to
+                // keep the cache directory from growing forever.
+                File[] oldReports = reportsDir.listFiles();
+                if (oldReports != null) {
+                    for (File oldReport : oldReports) {
+                        //noinspection ResultOfMethodCallIgnored
+                        oldReport.delete();
+                    }
+                }
 
                 String filename = "Attendance_Report_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".pdf";
                 File pdfFile = new File(reportsDir, filename);

@@ -65,6 +65,9 @@ public class ReportsActivity extends AppCompatActivity {
     private List<SessionSummary> currentSessions = new ArrayList<>();
     private AttendanceOverviewStats currentStats;
 
+    /** Class filter currently rendered in the report; used to skip redundant reloads. */
+    private long loadedClassFilter = Long.MIN_VALUE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,11 +142,14 @@ public class ReportsActivity extends AppCompatActivity {
         spClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    selectedClassId = -1;
-                } else {
-                    selectedClassId = teacherClasses.get(position - 1).getId();
+                long chosen = position == 0 ? -1 : teacherClasses.get(position - 1).getId();
+                // The spinner fires an initial callback after its first layout
+                // pass; skip it when this filter is already on screen, since
+                // onResume loads the data too.
+                if (chosen == loadedClassFilter) {
+                    return;
                 }
+                selectedClassId = chosen;
                 loadReportData();
             }
 
@@ -153,6 +159,7 @@ public class ReportsActivity extends AppCompatActivity {
     }
 
     private void loadReportData() {
+        loadedClassFilter = selectedClassId;
         currentStats = attendanceDao.getOverviewStats(teacherId, selectedClassId);
         currentSessions = attendanceDao.getSessionSummaries(teacherId, selectedClassId);
 

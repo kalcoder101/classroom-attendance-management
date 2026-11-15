@@ -147,9 +147,40 @@ public class ManageStudentsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Reload here so students added in AddStudentActivity appear immediately
+        // Reload here so students added in AddStudentActivity appear immediately,
+        // and so the class filter / edit-dialog spinner pick up classes that
+        // were created, edited or deleted on another screen.
+        reloadClassFilter();
         allStudents = studentDao.listForTeacher(teacherId);
         renderStudents();
+    }
+
+    /** Rebuilds the class-filter spinner, keeping the currently selected class when it still exists. */
+    private void reloadClassFilter() {
+        long previouslySelected = selectedClassId();
+
+        classes.clear();
+        List<String> filterLabels = new ArrayList<>();
+        filterLabels.add(getString(R.string.filter_all_classes));
+        for (SchoolClass c : new ClassDao(this).listForTeacher(teacherId)) {
+            classes.add(c);
+            filterLabels.add(c.getLabel());
+        }
+        ArrayAdapter<String> filterAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, filterLabels);
+        filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spClassFilter.setAdapter(filterAdapter);
+
+        // Restore the selection; "All classes" stays selected when the class
+        // was deleted or nothing was picked yet.
+        if (previouslySelected != -1) {
+            for (int i = 0; i < classes.size(); i++) {
+                if (classes.get(i).getId() == previouslySelected) {
+                    spClassFilter.setSelection(i + 1, false);
+                    break;
+                }
+            }
+        }
     }
 
     /** _id of the class picked in the filter spinner, or -1 for "All classes" */

@@ -561,6 +561,13 @@ public class TakeAttendanceActivity extends AppCompatActivity {
 
         String dateKey = DB_DATE.format(sessionDate.getTime());
         long sessionId = attendanceDao.getOrCreateSession(classId, dateKey);
+        if (sessionId == -1) {
+            // The session row could not be created (e.g. a race on the
+            // UNIQUE(class, date) constraint), so there is nothing to save into.
+            Toast.makeText(this, "Could not save attendance, try again",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         boolean saved = attendanceDao.saveRecords(sessionId, statuses);
 
         if (saved) {

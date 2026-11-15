@@ -59,7 +59,9 @@ public class AttendanceDao {
      * session twice simply updates it.
      */
     public boolean saveRecords(long sessionId, Map<Long, String> statuses) {
-        if (statuses.isEmpty()) {
+        // A non-existent session id would fail the foreign key on every insert,
+        // so reject it up front instead of crashing mid-transaction.
+        if (sessionId <= 0 || statuses.isEmpty()) {
             return false;
         }
 
