@@ -1,15 +1,22 @@
 package com.kal.classattendance;
 
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.button.MaterialButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -22,8 +29,11 @@ import com.kal.classattendance.data.ClassDao;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.data.TeacherDao;
 import com.kal.classattendance.model.Teacher;
+import com.kal.classattendance.util.AttendanceNotifier;
 import com.kal.classattendance.util.Dates;
 import com.kal.classattendance.util.Logout;
+import com.kal.classattendance.util.NotificationPrefs;
+import com.kal.classattendance.util.ReminderScheduler;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -139,6 +149,90 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Logout
         findViewById(R.id.btnLogout).setOnClickListener(v -> Logout.go(this));
+
+        // Notification settings (reminder time / on-off)
+        findViewById(R.id.btnOverflow).setOnClickListener(this::showOverflowMenu);
+
+        // Keep the recurring reminder + weekly digest scheduled for this teacher
+        if (teacherId != -1) {
+            ReminderScheduler.scheduleAll(this);
+        }
+    }
+
+    /** Small overflow menu in the app bar; currently only notification settings. */
+    private void showOverflowMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenu().add(0, 1, 0, R.string.notification_settings);
+        popup.setOnMenuItemClickListener(item -> {
+            showNotificationSettingsDialog();
+            return true;
+        });
+        popup.show();
+    }
+
+    /** Lets the teacher turn the daily reminder on/off and pick its time. */
+    private void showNotificationSettingsDialog() {
+        NotificationPrefs prefs = new NotificationPrefs(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_notification_settings, null);
+
+        SwitchCompat toggle = view.findViewById(R.id.swReminderEnabled);
+        TextView tvTime = view.findViewById(R.id.tvReminderTime);
+        MaterialButton btnChangeTime = view.findViewById(R.id.btnChangeTime);
+        TextView tvBlockedHint = view.findViewById(R.id.tvBlockedHint);
+
+        toggle.setChecked(prefs.isReminderEnabled());
+        updateReminderTimeLabel(tvTime, prefs);
+        updateReminderControls(prefs, tvTime, btnChangeTime);
+
+        if (!AttendanceNotifier.canPost(this)) {
+            tvBlockedHint.setVisibility(View.VISIBLE);
+        }
+
+        toggle.setOnCheckedChangeListener((button, checked) -> {
+            prefs.setReminderEnabled(checked);
+            updateReminderControls(prefs, tvTime, btnChangeTime);
+            if (checked) {
+                ReminderScheduler.scheduleDailyReminder(this,
+                        prefs.reminderHour(), prefs.reminderMinute());
+            } else {
+                ReminderScheduler.cancelReminder(this);
+            }
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .setPositiveButton(R.string.btn_done, null)
+                .create();
+        dialog.show();
+
+        btnChangeTime.setOnClickListener(v -> {
+            // A plain TimePickerDialog works with any theme and needs no fragment
+            new TimePickerDialog(this, (picker, hour, minute) -> {
+                prefs.setReminderTime(hour, minute);
+                updateReminderTimeLabel(tvTime, prefs);
+                if (prefs.isReminderEnabled()) {
+                    ReminderScheduler.scheduleDailyReminder(this,
+                            prefs.reminderHour(), prefs.reminderMinute());
+                }
+            }, prefs.reminderHour(), prefs.reminderMinute(),
+                    DateFormat.is24HourFormat(this)).show();
+        });
+    }
+
+    private void updateReminderTimeLabel(TextView view, NotificationPrefs prefs) {
+        java.util.Calendar time = java.util.Calendar.getInstance();
+        time.set(java.util.Calendar.HOUR_OF_DAY, prefs.reminderHour());
+        time.set(java.util.Calendar.MINUTE, prefs.reminderMinute());
+        String formatted = DateFormat.getTimeFormat(this).format(time.getTime());
+        view.setText(getString(R.string.reminder_time_label, formatted));
+    }
+
+    private void updateReminderControls(NotificationPrefs prefs,
+                                        TextView tvTime, MaterialButton btnChangeTime) {
+        boolean enabled = prefs.isReminderEnabled();
+        tvTime.setAlpha(enabled ? 1f : 0.5f);
+        btnChangeTime.setEnabled(enabled);
+        btnChangeTime.setAlpha(enabled ? 1f : 0.5f);
     }
 
     @Override

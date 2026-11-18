@@ -32,6 +32,17 @@
             android:textSize="20sp" />
 
         <ImageView
+            android:id="@+id/btnOverflow"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/notification_settings"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_more_vert" />
+
+        <ImageView
             android:id="@+id/btnLogout"
             android:layout_width="48dp"
             android:layout_height="48dp"

@@ -28,6 +28,11 @@ Built as a semester project for the **Mobile App Development** course using Nati
   - Radio options per student: **Present (P)**, **Absent (A)**, **Late (L)**.
   - Live summary chips updated on the fly.
   - Bulk actions: "Mark All Present" button and "Mark All Absent" menu option.
+- **Reminders & Insights (Local Notifications)**:
+  - Daily reminders listing classes that still have no attendance recorded, with a configurable reminder time.
+  - Low-attendance alerts when a saved session leaves students below the 75% at-risk threshold.
+  - A silent weekly summary of sessions, average attendance rate, and at-risk students.
+  - All notifications are local (WorkManager-scheduled) and never leave the device.
 - **Analytics & Multi-Page PDF Reports**:
   - Filter reports by specific class or view overall statistics across all classes.
   - Summary cards: Overall Attendance Rate, Total Sessions, and aggregated Present/Absent/Late counts.
@@ -82,7 +87,7 @@ This project strictly adheres to course requirements by implementing all four st
 ### Option 1: Direct APK Installation
 Download the pre-compiled APK from the [Releases](https://github.com/kalcoder101/classroom-attendance-management/releases) section or install directly via ADB:
 ```bash
-adb install -r ClassAttendance-v1.2.0.apk
+adb install -r ClassAttendance-v1.3.0.apk
 ```
 
 ### Option 2: Build from Source

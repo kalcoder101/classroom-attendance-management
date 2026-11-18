@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Class Attendance</string>
-    <string name="app_version">v1.2.0</string>
+    <string name="app_version">v1.3.0</string>
     <string name="mobile_programming_project">Mobile Programming Project</string>
     <string name="splash_tagline">Attendance made simple</string>
     <string name="logo_description">Class Attendance logo</string>
@@ -164,6 +164,38 @@
     <string name="notification_channel_description">Posted when attendance is saved</string>
     <string name="attendance_saved_title">Attendance saved</string>
     <string name="attendance_saved_summary">%1$s: %2$d P, %3$d A, %4$d L</string>
+
+    <!--Daily attendance reminder notification-->
+    <string name="reminder_channel_name">Attendance reminders</string>
+    <string name="reminder_channel_description">A daily reminder when a class still has no attendance today</string>
+    <string name="reminder_title">Attendance not recorded</string>
+    <plurals name="reminder_body">
+        <item quantity="one">%1$d class has no attendance recorded today. Tap to open it.</item>
+        <item quantity="other">%1$d classes have no attendance recorded today. Tap to open them.</item>
+    </plurals>
+    <string name="reminder_body_single">%1$s: no attendance recorded today. Tap to open it.</string>
+
+    <!--Low attendance (at-risk) notification-->
+    <string name="at_risk_channel_name">Low attendance alerts</string>
+    <string name="at_risk_channel_description">Alerts when students drop below 75% attendance</string>
+    <string name="at_risk_title">Low attendance in %1$s</string>
+    <plurals name="at_risk_body">
+        <item quantity="one">%1$d student is below 75% attendance. Tap to review the report.</item>
+        <item quantity="other">%1$d students are below 75% attendance. Tap to review the report.</item>
+    </plurals>
+
+    <!--Weekly summary notification-->
+    <string name="digest_channel_name">Weekly summary</string>
+    <string name="digest_channel_description">A weekly summary of sessions, attendance rate, and at-risk students</string>
+    <string name="digest_title">Your week in attendance</string>
+    <string name="digest_body">%1$d sessions · %2$d%% average attendance · %3$d at risk</string>
+
+    <!--Notification settings dialog-->
+    <string name="notification_settings">Notification settings</string>
+    <string name="reminder_toggle_label">Daily attendance reminder</string>
+    <string name="reminder_time_label">Reminder time: %1$s</string>
+    <string name="btn_change_time">Change time</string>
+    <string name="notifications_blocked_hint">Notifications are blocked for this app. Turn them on in system settings to receive reminders.</string>
     <!--Attendance report texts-->
     <string name="reports_title">Reports</string>
     <string name="reports_caption">Past sessions · tap one to edit marks</string>

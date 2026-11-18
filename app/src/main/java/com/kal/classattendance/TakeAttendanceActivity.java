@@ -30,6 +30,7 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.kal.classattendance.data.AttendanceDao;
+import com.kal.classattendance.data.AttendanceDao.StudentRosterStat;
 import com.kal.classattendance.data.StudentDao;
 import com.kal.classattendance.model.Student;
 import com.kal.classattendance.util.AttendanceNotifier;
@@ -565,6 +566,9 @@ public class TakeAttendanceActivity extends AppCompatActivity {
             AttendanceNotifier.notifySaved(this, teacherId, classId, classLabel,
                     counts[0], counts[1], counts[2]);
 
+            // Alert when this save left any student below the at-risk threshold
+            notifyAtRiskStudents();
+
             // Tell screens that may be open behind this one that data changed
             sendBroadcast(new Intent(ACTION_ATTENDANCE_SAVED).setPackage(getPackageName()));
 
@@ -576,5 +580,18 @@ public class TakeAttendanceActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, R.string.save_failed_attendance, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Posts a low-attendance alert if any student in this class is now below 75%. */
+    private void notifyAtRiskStudents() {
+        List<StudentRosterStat> roster = attendanceDao.getStudentRosterStats(teacherId, classId);
+        int atRisk = 0;
+        for (StudentRosterStat stat : roster) {
+            if (stat.isAtRisk()) {
+                atRisk++;
+            }
+        }
+        String label = classLabel != null ? classLabel : "";
+        AttendanceNotifier.notifyAtRisk(this, teacherId, classId, label, atRisk);
     }
 }
