@@ -68,6 +68,10 @@ The diagram below maps the application architecture, navigational transitions (`
 
 ![Class Attendance Class Diagram](docs/classdiagram.png)
 
+### Sequence Diagram
+
+![Take Attendance Sequence Diagram](docs/sequencediagram.png)
+
 ---
 
 ## Android Menu & Dialog Architecture
