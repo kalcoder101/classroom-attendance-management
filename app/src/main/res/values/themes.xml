@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ClassAttendance" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
+    <!-- Base application theme. Light-only: the app intentionally does not
+         ship a dark theme, so it stays identical whatever the system setting is. -->
+    <style name="Base.Theme.ClassAttendance" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/primary_blue</item>
         <item name="materialCalendarTheme">@style/ThemeOverlay.App.DatePicker</item>
+        <!-- Do not let Android auto-darken this light theme. -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.ClassAttendance" parent="Base.Theme.ClassAttendance" />

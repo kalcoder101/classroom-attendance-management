@@ -180,8 +180,8 @@
     <string name="at_risk_channel_description">Alerts when students drop below 75% attendance</string>
     <string name="at_risk_title">Low attendance in %1$s</string>
     <plurals name="at_risk_body">
-        <item quantity="one">%1$d student is below 75% attendance. Tap to review the report.</item>
-        <item quantity="other">%1$d students are below 75% attendance. Tap to review the report.</item>
+        <item quantity="one">%1$d student is below 75%% attendance. Tap to review the report.</item>
+        <item quantity="other">%1$d students are below 75%% attendance. Tap to review the report.</item>
     </plurals>
 
     <!--Weekly summary notification-->

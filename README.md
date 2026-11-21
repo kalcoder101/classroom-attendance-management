@@ -58,6 +58,18 @@ The diagram below maps the application architecture, navigational transitions (`
 
 ---
 
+## Use Case & Class Diagrams
+
+### Use Case Diagram
+
+![Class Attendance Use Case Diagram](docs/usecase.png)
+
+### Class Diagram
+
+![Class Attendance Class Diagram](docs/classdiagram.png)
+
+---
+
 ## Android Menu & Dialog Architecture
 
 This project strictly adheres to course requirements by implementing all four standard Android menu and dialog mechanisms:

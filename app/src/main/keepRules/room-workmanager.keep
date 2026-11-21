@@ -1,0 +1,18 @@
+# Keep rules for libraries that use reflection.
+#
+# AGP 9 runs R8 in full mode. Room creates its generated database
+# implementation (e.g. androidx.work.impl.WorkDatabase_Impl) by name via
+# Class.forName(...).getDeclaredConstructor().newInstance(), so the no-arg
+# constructor must not be shrunk or removed. Without this rule R8 strips it
+# and the app crashes at startup inside androidx.startup.InitializationProvider
+# with: NoSuchMethodException: androidx.work.impl.WorkDatabase_Impl.<init> []
+-keep class * extends androidx.room.RoomDatabase {
+    <init>();
+}
+
+# WorkManager recreates Worker instances reflectively from the class name that
+# was persisted when the work was enqueued, so keep the (Context,
+# WorkerParameters) constructor on every Worker subclass.
+-keep class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+}
